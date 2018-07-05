@@ -49,29 +49,18 @@ spec:
                   fieldPath: status.podIP
             - name: SYNSE_DEBUG
               value: "true"
+            # Register the RS458 plugin with Synse Server. There is only one
+            # instance of the plugin per Chamber in order to prevent bus collisions.
+            # The RS485 pod sits behind an RS485 service, which we reference here to
+            # access the pod.
             # Register all I2C Plugins in a Chamber (1 per VEC, for a total of
             # 6) with Synse Server. I2C plugins are currently a StatefulSet with
             # a headless Service - while their IP may change if they go down/up
             # this setup allows us to reference them via kube DNS in the format:
             #   {pod name}.{service name}.{namespace}.svc.cluster.local
-            - name: SYNSE_PLUGIN_TCP_I2C0
-              value: {{ .Release.Name }}-i2c-0.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002
-            - name: SYNSE_PLUGIN_TCP_I2C1
-              value: {{ .Release.Name }}-i2c-1.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002
-            - name: SYNSE_PLUGIN_TCP_I2C2
-              value: {{ .Release.Name }}-i2c-2.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002
-            - name: SYNSE_PLUGIN_TCP_I2C3
-              value: {{ .Release.Name }}-i2c-3.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002
-            - name: SYNSE_PLUGIN_TCP_I2C4
-              value: {{ .Release.Name }}-i2c-4.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002
-            - name: SYNSE_PLUGIN_TCP_I2C5
-              value: {{ .Release.Name }}-i2c-5.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002
-            # Register the RS458 plugin with Synse Server. There is only one
-            # instance of the plugin per Chamber in order to prevent bus collisions.
-            # The RS485 pod sits behind an RS485 service, which we reference here to
-            # access the pod.
-            - name: SYNSE_PLUGIN_TCP_RS485
-              value: {{ .Release.Name }}-rs485:5001
+            - name: SYNSE_PLUGIN_TCP
+              value: {{ .Release.Name }}-rs485:5001,{{ .Release.Name }}-i2c-0.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002,{{ .Release.Name }}-i2c-1.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002,{{ .Release.Name }}-i2c-2.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002,{{ .Release.Name }}-i2c-3.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002,{{ .Release.Name }}-i2c-4.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002,{{ .Release.Name }}-i2c-5.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002
+
         {{ if .Values.resources }}
         resources:
 {{ toYaml .Values.resources | indent 12 }}

@@ -7,8 +7,8 @@ replicaCount: 1
 image:
   registry: "" # Add a registry if we need to use the non-default one
   repository: vaporio/synse-server
-  tag: 2.0.0-slim
-  pullPolicy: IfNotPresent
+  tag: edge-slim
+  pullPolicy: Always
 
 service:
   type: ClusterIP
