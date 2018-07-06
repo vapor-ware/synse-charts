@@ -47,8 +47,14 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: status.podIP
-            - name: SYNSE_DEBUG
-              value: "true"
+            {{ if .Values.debug }}
+            - name: SYNSE_LOGGING
+              value: "debug"
+            {{ end }}
+
+            # FIXME: configure synse server for plugin discovery via k8s services
+            # see: http://synse-server.readthedocs.io/en/latest/user/advanced.html#plugin-service-discovery-via-kubernetes
+
             # Register the RS458 plugin with Synse Server. There is only one
             # instance of the plugin per Chamber in order to prevent bus collisions.
             # The RS485 pod sits behind an RS485 service, which we reference here to

@@ -1,13 +1,20 @@
-# Default values for wrigley.
+# Default values for Synse Server.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
 replicaCount: 1
 
+# Run Synse Server in debug mode
+debug: true
+
 image:
   registry: "" # Add a registry if we need to use the non-default one
   repository: vaporio/synse-server
-  tag: edge-slim
+  # In general, all releases should use a *-slim image -- this is the image
+  # without the baked-in emulator. The two common -slim images are:
+  #  - edge-slim:   A build from the master branch  (for dev only; not guaranteed stable)
+  #  - latest-slim: A build from the latest release (should be stable)
+  tag: latest-slim
   pullPolicy: Always
 
 service:
