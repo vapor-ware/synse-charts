@@ -11,6 +11,6 @@ metadata:
 {{ include "annotations" . | indent 4 }}
 spec:
   backend:
-    serviceName: {{ template "name" . }}
+    serviceName: {{ template "fullname" . }}
     servicePort: {{ .Values.service.port }}
 {{- end }}
