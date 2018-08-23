@@ -1,0 +1,59 @@
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  labels:
+    app: {{ template "fullname" . }}
+  name: {{ template "fullname" . }}
+spec:
+  # The SNMP plug in only has one instance per Chamber cluster.
+  replicas: {{ .Values.replicaCount }}
+  selector:
+{{ include "selector" . | indent 2 }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "fullname" . }}
+    spec:
+      # Setting the hostname because the UPSs only take commumications from specific hostnames.
+      # This works from the container which has a different host name than the VEC.
+      hostname: {{ template "name" . }}
+      volumes:
+        - name: {{ template "fullname" . }}
+          configMap:
+            name: {{ template "fullname" . }}
+        - name: {{ template "fullname" . }}-devices
+          configMap:
+            name: {{ template "fullname" . }}-devices
+      containers:
+        - name: {{ template "fullname" . }}
+          image: {{ .Values.image.registry }}{{ .Values.image.repository }}:{{ .Values.image.tag }}
+          # Above uses the latest snmp image that is built in CI.
+          securityContext:
+            privileged: true
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+          env:
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: PLUGIN_CONFIG
+              value: /tmp
+            - name: PLUGIN_DEVICE_CONFIG
+              value: /plugin/config
+          resources:
+            requests:
+              cpu: {{ .Values.resources.requests.cpu }}
+              memory: {{ .Values.resources.requests.memory }}
+          # /tmp is mounted for the plugin configuration.
+          # /plugin/config is mounted for the device configuration.
+          volumeMounts:
+            - name: {{ template "fullname" . }}
+              mountPath: /tmp
+            - name: {{ template "fullname" . }}-devices
+              mountPath: /plugin/config
