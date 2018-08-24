@@ -7,9 +7,11 @@ metadata:
   annotations:
 {{ include "annotations" . | indent 4 }}
 spec:
+  {{ if .Values.service.type -}}
+  {{ .Values.service.type }}
+  {{- end }}
   ports:
     - port: {{ .Values.service.port }}
       name: http
   selector:
 {{ include "selector" . | indent 4 }}
-    clusterIP: None

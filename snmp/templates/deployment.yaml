@@ -1,9 +1,9 @@
 kind: Deployment
 apiVersion: extensions/v1beta1
 metadata:
-  labels:
-    app: {{ template "fullname" . }}
   name: {{ template "fullname" . }}
+  labels:
+{{ include "labels" . | indent 4 }}
 spec:
   # The SNMP plug in only has one instance per Chamber cluster.
   replicas: {{ .Values.replicaCount }}
