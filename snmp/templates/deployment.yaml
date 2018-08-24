@@ -12,7 +12,7 @@ spec:
   template:
     metadata:
       labels:
-        app: {{ template "fullname" . }}
+{{ include "labels" . | indent 6 }}
     spec:
       # Setting the hostname because the UPSs only take commumications from specific hostnames.
       # This works from the container which has a different host name than the VEC.
