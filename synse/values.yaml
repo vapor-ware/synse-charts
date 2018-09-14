@@ -7,6 +7,9 @@ replicaCount: 1
 # Run Synse Server in debug mode
 debug: true
 
+# Enable service discovery for plugins
+discoverPlugins: false
+
 image:
   registry: "" # Add a registry if we need to use the non-default one
   repository: vaporio/synse-server
@@ -14,7 +17,7 @@ image:
   # without the baked-in emulator. The two common -slim images are:
   #  - edge-slim:   A build from the master branch  (for dev only; not guaranteed stable)
   #  - latest-slim: A build from the latest release (should be stable)
-  tag: latest-slim
+  tag: latest
   pullPolicy: Always
 
 service:

@@ -28,6 +28,9 @@ spec:
             containerPort: {{ .Values.service.port }}
             hostPort: {{ .Values.service.port }}
             protocol: TCP
+        {{ if .Values.args }}
+        args: {{ .Values.args }}
+        {{ end}}
         # TODO: We need to add these
         # livenessProbe:
         #   httpGet:
@@ -64,8 +67,31 @@ spec:
             # a headless Service - while their IP may change if they go down/up
             # this setup allows us to reference them via kube DNS in the format:
             #   {pod name}.{service name}.{namespace}.svc.cluster.local
+
+            {{ if .Values.discoverPlugins }}
+            # FIXME (etd) - it was originally designed out that we would have somthing like
+            # labels:
+            #   app: synse
+            #   component: plugin
+            #   plugin: emulator
+            #
+            # but because of the way things are templated out, we'll just get
+            # labels:
+            #   app: emulator
+            #   component: plugin
+            #
+            # so, we can't use the app=synse label for filtering.... we should probably
+            # fix that, since filtering on only a single label seems non-ideal.
+            #- name: SYNSE_PLUGIN_DISCOVER_KUBERNETES_ENDPOINTS_LABELS_APP
+            #  value: synse
+            - name: SYNSE_PLUGIN_DISCOVER_KUBERNETES_ENDPOINTS_LABELS_COMPONENT
+              value: plugin
+            {{ else }}
+            # FIXME: keeping this for now, but maybe it should be removed and we just
+            # use plugin service discovery all the time?
             - name: SYNSE_PLUGIN_TCP
               value: {{ .Release.Name }}-rs485:5001,{{ .Release.Name }}-i2c-0.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002,{{ .Release.Name }}-i2c-1.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002,{{ .Release.Name }}-i2c-2.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002,{{ .Release.Name }}-i2c-3.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002,{{ .Release.Name }}-i2c-4.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002,{{ .Release.Name }}-i2c-5.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002
+            {{ end }}
 
         {{ if .Values.resources }}
         resources:

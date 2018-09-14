@@ -1,0 +1,16 @@
+# Emulator plugin configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "name" . }}-plugin
+  labels:
+{{ include "labels" . | indent 4 }}
+  annotations:
+{{ include "annotations" . | indent 4 }}
+data:
+  config.yml: |
+    version: 1.1
+    debug: {{ .Values.debug }}
+    network:
+      type: tcp
+      address: "0.0.0.0:{{ .Values.service.port }}"
