@@ -52,5 +52,5 @@ tolerations: []
 
 affinity: {}
 
-# Component 
+# Component
 component: server

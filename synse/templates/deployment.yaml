@@ -90,7 +90,7 @@ spec:
             # FIXME: keeping this for now, but maybe it should be removed and we just
             # use plugin service discovery all the time?
             - name: SYNSE_PLUGIN_TCP
-              value: {{ .Release.Name }}-rs485:5001,{{ .Release.Name }}-i2c-0.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002,{{ .Release.Name }}-i2c-1.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002,{{ .Release.Name }}-i2c-2.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002,{{ .Release.Name }}-i2c-3.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002,{{ .Release.Name }}-i2c-4.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002,{{ .Release.Name }}-i2c-5.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002
+              value: {{ .Release.Name }}-rs485:5001,{{ .Release.Name }}-i2c-0.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002,{{ .Release.Name }}-i2c-1.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002,{{ .Release.Name }}-i2c-2.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002,{{ .Release.Name }}-i2c-3.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002,{{ .Release.Name }}-i2c-4.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002,{{ .Release.Name }}-i2c-5.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002,{{ .Release.Name }}-modbus:5004
             {{ end }}
 
         {{ if .Values.resources }}

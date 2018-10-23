@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+{{ include "labels" . | indent 4 }}
+  annotations:
+{{ include "annotations" . | indent 4 }}
+spec:
+  {{ if .Values.service.type -}}
+  {{ .Values.service.type }}
+  {{- end }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+{{ include "selector" . | indent 4 }}
