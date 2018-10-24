@@ -1,11 +1,6 @@
-# Sample Config
-# -------------
-
 # Modbus TCP/IP plugin configuration
 apiVersion: v1
 kind: ConfigMap
-
-# TODO: We should doc what this does. It looks like a common cut and paste code block.
 metadata:
   name: {{ template "name" . }}-plugin
   labels:
@@ -13,7 +8,6 @@ metadata:
   annotations:
 {{ include "annotations" . | indent 4 }}
 data:
-  # Pull the plugin config from .Values.config.
   {{- if .Values.config }}
   config.yml: {{ toYaml .Values.config | quote }}
   {{- end }}
@@ -21,7 +15,6 @@ data:
 # Modbus TCP/IP device configuration
 apiVersion: v1
 kind: ConfigMap
-
 metadata:
   name: {{ template "name" . }}-devices
   labels:
@@ -29,7 +22,6 @@ metadata:
   annotations:
 {{ include "annotations" . | indent 4 }}
 data:
-  # Pull the plugin config from .Values.devices.
   {{- if .Values.devices }}
   config.yml: {{ toYaml .Values.devices | quote }}
   {{- end }}

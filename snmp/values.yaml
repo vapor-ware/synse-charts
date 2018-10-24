@@ -2,27 +2,63 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+## The SNMP plugin should only have one instance per Chamber.
+## Do not change this value.
 replicaCount: 1
 
 image:
   registry: "" # Add a registry if we need to use the non-default one
   repository: vaporio/snmp-plugin
   tag: edge
+  pullPolicy: Always
 
+## Service configurations for the SNMP plugin.
+## ref: http://kubernetes.io/docs/user-guide/services/
+##
+## The port defined here should match the plugin configuration, below.
 service:
   type: "clusterIP: None"
   port: 5003
 
+## Configure resource requests and limits.
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
 resources:
   requests:
    cpu: 33m
    memory: 150Mi
 
-nodeSelector: {}
-
-tolerations: []
-
-affinity: {}
+## Pass arguments to the plugin container. For additional startup
+## logging, you can pass the --debug flag. By default, no additional
+## arguments are passed to the container.
+#args: ["--debug"]
+args: []
 
 # Component 
 component: plugin
+
+## Plugin Configuration
+## If the plugin will use dynamic configuration, this config should be
+## overridden at the site-level, where the site-specific dynamic config
+## can be specified under the `dynamicRegistration` field. For an example,
+## see: https://github.com/vapor-ware/synse-snmp-plugin/blob/master/config.yml
+config:
+  version: 1.0
+  debug: true
+  network:
+    type: tcp
+    address: "0.0.0.0:5003"
+  settings:
+    mode: serial
+    read:
+      interval: 3s
+      buffer: 1024
+    write:
+      interval: 1s
+      buffer: 1024
+
+## Device configuration
+## Each site should define its own device configuration since this may
+## change from site to site depending on what is actually deployed. If
+## using dynamic registration, this field does not need to be set -
+## instead, the `config` field should be overridden on a per-site basis.
+devices: {}

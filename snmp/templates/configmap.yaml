@@ -1,0 +1,27 @@
+# SNMP plugin configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "name" . }}-plugin
+  labels:
+{{ include "labels" . | indent 4 }}
+  annotations:
+{{ include "annotations" . | indent 4 }}
+data:
+  {{- if .Values.config }}
+  config.yml: {{ toYaml .Values.config | quote }}
+  {{- end }}
+---
+# SNMP device configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "name" . }}-devices
+  labels:
+{{ include "labels" . | indent 4 }}
+  annotations:
+{{ include "annotations" . | indent 4 }}
+data:
+  {{- if .Values.devices }}
+  devices.yml: {{ toYaml .Values.devices | quote }}
+  {{- end }}

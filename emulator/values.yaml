@@ -4,36 +4,41 @@
 
 replicaCount: 1
 
-# Run the plugin in debug mode
-debug: true
-
 image:
   registry: "" # Add a registry if we need to use the non-default one
   repository: vaporio/emulator-plugin
   tag: "latest"
   pullPolicy: Always
 
+## Service configurations for the emulator plugin.
+## ref: http://kubernetes.io/docs/user-guide/services/
+##
+## The port here should match the network address in the
+## plugin configuration, below.
 service:
-  type: "ClusterIP: None"
+  type: "clusterIP: None"
   port: 5001
 
+## Configure resource requests and limits.
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
 resources:
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #  cpu: 100m
-  #  memory: 128Mi
   requests:
    cpu: 33m
    memory: 150Mi
 
-nodeSelector: {}
+## Pass arguments to the plugin container. For additional startup
+## logging, you can pass the --debug flag. By default, no additional
+## arguments are passed to the container.
+#args: ["--debug"]
+args: []
 
-tolerations: []
-
-affinity: {}
-
-# Component type
+## Component type
 component: plugin
+
+## Synse Emulator Plugin configuration.
+config:
+  version: 1.1
+  debug: true
+  network:
+    type: tcp
+    address: "0.0.0.0:5001"

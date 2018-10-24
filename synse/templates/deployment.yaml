@@ -19,81 +19,38 @@ spec:
       annotations:
 {{ include "annotations" . | indent 8 }}
     spec:
+      terminationGracePeriodSeconds: 3
+      volumes:
+      - name: config
+        configMap:
+          name: {{ template "name" . }}-config
       containers:
       - name: {{ .Chart.Name }}
-        image: "{{ .Values.image.registry }}{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        image: {{ .Values.image.registry }}{{ .Values.image.repository }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
-          - name: http
-            containerPort: {{ .Values.service.port }}
-            hostPort: {{ .Values.service.port }}
-            protocol: TCP
-        {{ if .Values.args }}
+        - name: http
+          containerPort: {{ .Values.service.port }}
+          hostPort: {{ .Values.service.port }}
+        {{- if .Values.args }}
         args: {{ .Values.args }}
-        {{ end}}
-        # TODO: We need to add these
-        # livenessProbe:
-        #   httpGet:
-        #     path: /
-        #     port: http
-        # readinessProbe:
-        #   httpGet:
-        #     path: /
-        #     port: http
-        # TODO: Make all of this suck less (aka dynamic)
-        env:
-            - name: NODE_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: spec.nodeName
-            - name: POD_IP
-              valueFrom:
-                fieldRef:
-                  fieldPath: status.podIP
-            {{ if .Values.debug }}
-            - name: SYNSE_LOGGING
-              value: "debug"
-            {{ end }}
-
-            # FIXME: configure synse server for plugin discovery via k8s services
-            # see: http://synse-server.readthedocs.io/en/latest/user/advanced.html#plugin-service-discovery-via-kubernetes
-
-            # Register the RS458 plugin with Synse Server. There is only one
-            # instance of the plugin per Chamber in order to prevent bus collisions.
-            # The RS485 pod sits behind an RS485 service, which we reference here to
-            # access the pod.
-            # Register all I2C Plugins in a Chamber (1 per VEC, for a total of
-            # 6) with Synse Server. I2C plugins are currently a StatefulSet with
-            # a headless Service - while their IP may change if they go down/up
-            # this setup allows us to reference them via kube DNS in the format:
-            #   {pod name}.{service name}.{namespace}.svc.cluster.local
-
-            {{ if .Values.discoverPlugins }}
-            # FIXME (etd) - it was originally designed out that we would have somthing like
-            # labels:
-            #   app: synse
-            #   component: plugin
-            #   plugin: emulator
-            #
-            # but because of the way things are templated out, we'll just get
-            # labels:
-            #   app: emulator
-            #   component: plugin
-            #
-            # so, we can't use the app=synse label for filtering.... we should probably
-            # fix that, since filtering on only a single label seems non-ideal.
-            #- name: SYNSE_PLUGIN_DISCOVER_KUBERNETES_ENDPOINTS_LABELS_APP
-            #  value: synse
-            - name: SYNSE_PLUGIN_DISCOVER_KUBERNETES_ENDPOINTS_LABELS_COMPONENT
-              value: plugin
-            {{ else }}
-            # FIXME: keeping this for now, but maybe it should be removed and we just
-            # use plugin service discovery all the time?
-            - name: SYNSE_PLUGIN_TCP
-              value: {{ .Release.Name }}-rs485:5001,{{ .Release.Name }}-i2c-0.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002,{{ .Release.Name }}-i2c-1.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002,{{ .Release.Name }}-i2c-2.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002,{{ .Release.Name }}-i2c-3.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002,{{ .Release.Name }}-i2c-4.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002,{{ .Release.Name }}-i2c-5.{{ .Release.Name }}-i2c.default.svc.cluster.local:5002,{{ .Release.Name }}-modbus:5004
-            {{ end }}
-
-        {{ if .Values.resources }}
+        {{- end }}
+        # Basic readiness/liveness probes. These could be expanded upon in the future.
+        livenessProbe:
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          httpGet:
+            path: /synse/test
+            port: http
+        readinessProbe:
+          initialDelaySeconds: 5
+          httpGet:
+            path: /synse/test
+            port: http
+        volumeMounts:
+        - name: config
+          mountPath: /synse/config
+        {{ if .Values.resources -}}
         resources:
-{{ toYaml .Values.resources | indent 12 }}
-        {{ end }}
+{{ toYaml .Values.resources | indent 10 }}
+        {{- end }}

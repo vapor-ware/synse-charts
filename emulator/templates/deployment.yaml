@@ -1,4 +1,4 @@
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ template "fullname" . }}
@@ -13,50 +13,37 @@ spec:
 {{ include "selector" . | indent 6 }}
   template:
     metadata:
-      name: {{ template "fullname" .}}
+      name: {{ template "fullname" . }}
       labels:
 {{ include "labels" . | indent 8 }}
       annotations:
 {{ include "annotations" . | indent 8 }}
     spec:
-      containers:
-        - name: {{ .Chart.Name }}
-          image: {{ .Values.image.registry }}{{ .Values.image.repository }}:{{ .Values.image.tag }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          ports:
-            - name: http
-              containerPort: {{ .Values.service.port }}
-              protocol: TCP
-          # TODO: add these
-          # livenessProbe:
-          #   httpGet:
-          #     path: /
-          #     port: http
-          # readinessProbe:
-          #   httpGet:
-          #     path: /
-          #     port: http
-          env:
-            - name: PLUGIN_CONFIG
-              value: /tmp/synse/plugin
-          volumeMounts:
-            - name: {{ template "name" . }}-plugin
-              mountPath: /tmp/synse/plugin
+      terminationGracePeriodSeconds: 3
       volumes:
-        - name: {{ template "name" . }}-plugin
-          configMap:
-            name: {{ template "name" . }}-plugin
-      resources:
-{{ toYaml .Values.resources | indent 12 }}
-    {{- with .Values.nodeSelector }}
-      nodeSelector:
-{{ toYaml . | indent 8 }}
-    {{- end }}
-    {{- with .Values.affinity }}
-      affinity:
-{{ toYaml . | indent 8 }}
-    {{- end }}
-    {{- with .Values.tolerations }}
-      tolerations:
-{{ toYaml . | indent 8 }}
-    {{- end }}
+      - name: config
+        configMap:
+          name: {{ template "name" . }}-config
+      containers:
+      - name: {{ .Chart.Name }}
+        image: {{ .Values.image.registry }}{{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.service.port }}
+        {{- if .Values.args }}
+        args: {{ .Values.args }}
+        {{- end }}
+        env:
+        # We need to manually specify a non-default path here. If we
+        # mount the config to the default path, the built-in emulator
+        # configs will not get picked up.
+        - name: PLUGIN_CONFIG
+          value: /tmp/synse/plugin
+        volumeMounts:
+        - name: config
+          mountPath: /tmp/synse/plugin
+        {{- if .Values.resources }}
+        resources:
+{{ toYaml .Values.resources | indent 10}}
+        {{- end -}}

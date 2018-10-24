@@ -4,12 +4,6 @@
 
 replicaCount: 1
 
-# Run Synse Server in debug mode
-debug: true
-
-# Enable service discovery for plugins
-discoverPlugins: false
-
 image:
   registry: "" # Add a registry if we need to use the non-default one
   repository: vaporio/synse-server
@@ -20,6 +14,8 @@ image:
   tag: latest
   pullPolicy: Always
 
+## Service configurations for Synse Server.
+## ref: http://kubernetes.io/docs/user-guide/services/
 service:
   type: ClusterIP
   port: 5000
@@ -34,23 +30,36 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
+## Configure resource requests and limits.
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
 resources:
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #  cpu: 100m
-  #  memory: 128Mi
   requests:
    cpu: 33m
    memory: 150Mi
 
-nodeSelector: {}
-
-tolerations: []
-
-affinity: {}
-
-# Component
+## Component
 component: server
+
+## Synse Server configuration. This configuration is placed into a ConfigMap where
+## it is then mounted into the container. The config options here can be overridden
+## with environment variables, if desired. For more information on configuring Synse
+## Server, see: https://synse-server.readthedocs.io/en/latest/user/configuration.html#configuring-synse-server
+config:
+  logging: debug
+  pretty_json: true
+
+  # For our deployments, we'll enable plugin discovery via
+  # kubernetes service endpoints.
+  plugin:
+    discover:
+      kubernetes:
+        endpoints:
+          labels:
+            # FIXME (etd): a while back we discussed keying this off of
+            # two labels, "app=synse" and "component=plugin". Right now,
+            # the "app" label defaults to the name of the service (e.g.
+            # i2c), so we can't use that. for now, we'll only key off of
+            # the "component" key. For Synse Server to find the plugin,
+            # all plugins must have a service with the "component=plugin"
+            # label set.
+            component: plugin

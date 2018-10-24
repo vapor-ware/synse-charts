@@ -1,5 +1,5 @@
+apiVersion: apps/v1
 kind: Deployment
-apiVersion: extensions/v1beta1
 metadata:
   name: {{ template "fullname" . }}
   labels:
@@ -7,57 +7,48 @@ metadata:
   annotations:
 {{ include "annotations" . | indent 4 }}
 spec:
-  # The SNMP plug in only has one instance per Chamber cluster.
   replicas: {{ .Values.replicaCount }}
   selector:
-{{ include "selector" . | indent 2 }}
+    matchLabels:
+{{ include "selector" . | indent 6 }}
   template:
     metadata:
+      name: {{ template "fullname" . }}
       labels:
 {{ include "labels" . | indent 8 }}
       annotations:
 {{ include "annotations" . | indent 8 }}
     spec:
-      # Setting the hostname because the UPSs only take commumications from specific hostnames.
+      # Setting the hostname because the UPSs only take communications from specific hostnames.
       # This works from the container which has a different host name than the VEC.
       hostname: {{ template "name" . }}
+      terminationGracePeriodSeconds: 3
       volumes:
-        - name: {{ template "fullname" . }}
-          configMap:
-            name: {{ template "fullname" . }}
-        - name: {{ template "fullname" . }}-devices
-          configMap:
-            name: {{ template "fullname" . }}-devices
+      - name: plugin-config
+        configMap:
+          name: {{ template "name" . }}-plugin
+      - name: device-config
+        configMap:
+          name: {{ template "name" . }}-devices
       containers:
-        - name: {{ template "fullname" . }}
-          image: {{ .Values.image.registry }}{{ .Values.image.repository }}:{{ .Values.image.tag }}
-          # Above uses the latest snmp image that is built in CI.
-          securityContext:
-            privileged: true
-          ports:
-            - name: http
-              containerPort: {{ .Values.service.port }}
-          env:
-            - name: NODE_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: spec.nodeName
-            - name: POD_IP
-              valueFrom:
-                fieldRef:
-                  fieldPath: status.podIP
-            - name: PLUGIN_CONFIG
-              value: /tmp
-            - name: PLUGIN_DEVICE_CONFIG
-              value: /plugin/config
-          resources:
-            requests:
-              cpu: {{ .Values.resources.requests.cpu }}
-              memory: {{ .Values.resources.requests.memory }}
-          # /tmp is mounted for the plugin configuration.
-          # /plugin/config is mounted for the device configuration.
-          volumeMounts:
-            - name: {{ template "fullname" . }}
-              mountPath: /tmp
-            - name: {{ template "fullname" . }}-devices
-              mountPath: /plugin/config
+      - name: {{ .Chart.Name }}
+        image: {{ .Values.image.registry }}{{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ## QUESTION (etd): does SNMP need to run as a privileged container??
+        securityContext:
+          privileged: true
+        ports:
+        - name: http
+          containerPort: {{ .Values.service.port }}
+        {{- if .Values.args }}
+        args: {{ .Values.args }}
+        {{- end }}
+        volumeMounts:
+        - name: plugin-config
+          mountPath: /etc/synse/plugin/config
+        - name: device-config
+          mountPath: /etc/synse/plugin/config/devices
+        {{ if .Values.resources -}}
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
+        {{- end }}
