@@ -1,7 +1,12 @@
 ---
 
 name: modbus
-version: 0.0.2
+version: 0.1.0
 description: Synse Modbus Over IP Plugin.
 home: https://github.com/vapor-ware/synse-modbus-ip-plugin
-icon: http://www.vapor.io/wp-content/uploads/2016/01/Vapor_Chamber_Logo.png
+icon: https://charts.vapor.io/.images/synse-modbus.jpg
+maintainers:
+- name: Matthew Hink
+  email: mhink@vapor.io
+- name: Marco Ceppi
+  email: marco@vapor.io
