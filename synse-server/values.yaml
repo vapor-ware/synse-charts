@@ -8,10 +8,8 @@ image:
   registry: "" # Add a registry if we need to use the non-default one
   repository: vaporio/synse-server
   # In general, all releases should use a *-slim image -- this is the image
-  # without the baked-in emulator. The two common -slim images are:
-  #  - edge-slim:   A build from the master branch  (for dev only; not guaranteed stable)
-  #  - latest-slim: A build from the latest release (should be stable)
-  tag: latest
+  # without the baked-in emulator.
+  tag: "v2.2.4-slim"
   pullPolicy: Always
 
 ## Service configurations for Synse Server.

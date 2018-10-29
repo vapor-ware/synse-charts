@@ -1,0 +1,13 @@
+---
+
+name: synse-server
+version: 0.1.0
+appVersion: 2.2.4
+description: An HTTP API for the monitoring and control of physical and virtual devices.
+home: https://github.com/vapor-ware/synse-server
+icon: https://charts.vapor.io/.images/synse-server-chart.jpg
+maintainers:
+- name: Erick Daniszewski
+  email: erick@vapor.io
+- name: Marco Ceppi
+  email: marco@vapor.io
