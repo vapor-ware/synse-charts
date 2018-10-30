@@ -1,7 +1,7 @@
 ---
 
 name: snmp
-version: 0.0.2
+version: 0.0.3
 description: snmp
 home: https://github.com/vapor-ware/synse-snmp-plugin.git
 icon: http://www.vapor.io/wp-content/uploads/2016/01/Vapor_Chamber_Logo.png
