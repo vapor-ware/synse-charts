@@ -5,7 +5,12 @@ pipeline {
   stages {
     stage('Checkout') {
       steps {
-        checkout scm
+        checkout([
+          $class: 'GitSCM',
+          branches: scm.branches,
+          extensions: scm.extensions + [[$class: 'LocalBranch'], [$class: 'WipeWorkspace']],
+          userRemoteConfigs: scm.userRemoteConfigs
+        ])
       }
     }
     stage('Tools') {
@@ -16,6 +21,16 @@ pipeline {
     stage('Lint') {
       steps {
         sh 'helm lint */'
+      }
+    }
+    stage('Diff') {
+      when {
+        changeRequest()
+      }
+      steps {
+        sh ''
+        sh 'git checkout origin/master'
+        checkout scm
       }
     }
     stage('Publish') {
@@ -41,5 +56,27 @@ pipeline {
         }
       }
     }
+  }
+}
+
+def helmDiff(job) {
+  echo "Generating a diff between master and branch"
+  return {
+    stage("Build py:${job}") {
+      sh "docker build -t vaporio/python:${job} ${job}/bionic"
+    }
+  }
+}
+
+def helmDryRun(chart, saveTo) {
+  script {
+    cmd = "helm install --debug --dry-run --dep-up ${chart}"
+    echo "Running `${cmd}`"
+
+    if (saveTo.equals('')) {
+      saveTo = 'helmOutput'
+    }
+
+    sh "${cmd} | tail -n +10 > ${saveTo}/${chart}"
   }
 }
