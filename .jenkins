@@ -22,15 +22,14 @@ pipeline {
       when {
         branch 'master'
       }
+      environment {
+        GOOGLE_APPLICATION_CREDENTIALS = credentials('vio-build-gcp-serviceaccount')
+      }
       steps {
         // Create our staging repos
         sh 'mkdir -p .chart-repo .chart-staging'
         // Mount .chart-repo to Google Cloud Storage
-        withCredentials([
-          file(credentialsId: 'vio-build-gcp-serviceaccount', variable: 'GOOGLE_APPLICATION_CREDENTIALS')
-        ]) {
-          sh 'gcsfuse synse-charts .chart-repo'
-        }
+        sh 'gcsfuse synse-charts .chart-repo'
         // Build packages in .chart-staging, move new ones to .chart-repo (gcs), create new index
         sh 'helm package --dependency-update --destination .chart-staging */'
         sh 'cp -vn .chart-staging/*.tgz .chart-repo/'
@@ -38,8 +37,7 @@ pipeline {
       }
       post {
         always {
-          sh 'fusermount -u .chart-repo'
-          sh 'rm -rf .chart-staging .chart-repo'
+          sh 'fusermount -u .chart-repo && rm -rf .chart-staging .chart-repo'
         }
       }
     }
