@@ -3,14 +3,14 @@ pipeline {
   agent any
 
   stages {
-    stage('Tools') {
-      steps {
-        sh 'helm version --client'
-      }
-    }
     stage('Checkout') {
       steps {
         checkout scm
+      }
+    }
+    stage('Tools') {
+      steps {
+        sh 'helm version --client'
       }
     }
     stage('Lint') {
