@@ -20,6 +20,7 @@ spec:
 {{ include "annotations" . | indent 8 }}
     spec:
       terminationGracePeriodSeconds: 3
+      serviceAccountName: {{ template "fullname" . }}
       volumes:
       - name: config
         configMap:
