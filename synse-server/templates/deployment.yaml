@@ -20,7 +20,13 @@ spec:
 {{ include "annotations" . | indent 8 }}
     spec:
       terminationGracePeriodSeconds: 3
+      {{- if .Values.config.plugin.discover.kubernetes }}
+      # If Synse Server is configured to run with plugin discovery via the
+      # Kubernetes API, use the ServiceAccount that was created for it. The
+      # ServiceAccount will give Synse Server the proper cluster permissions
+      # to use the required Kubernetes API components.
       serviceAccountName: {{ template "fullname" . }}
+      {{- end }}
       volumes:
       - name: config
         configMap:
