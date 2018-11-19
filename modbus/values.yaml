@@ -9,7 +9,9 @@ image:
   repository: vaporio/modbus-ip-plugin
   #tag: "1.1.0"
   tag: "phoenix-4.0"
-  pullPolicy: Always
+  #pullPolicy: Always
+  pullPolicy: Never # Change before checkin.
+
 
 ## Service configurations for the modbus plugin.
 ## ref: http://kubernetes.io/docs/user-guide/services/
@@ -20,7 +22,7 @@ service:
   port: 5004
 
 ## Configure resource requests and limits.
-## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+## ref: http://kubernetes.io/docs/user-guide:/compute-resources/
 resources:
   requests:
     cpu: 33m
