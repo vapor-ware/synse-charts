@@ -1,0 +1,14 @@
+# If Synse Server is configured to run with plugin discovery via the
+# Kubernetes API, this template will be rendered. If the Kubernetes
+# discovery config is not set, Synse Server will not use the Kubernetes
+# API and will not need to be granted additional cluster permissions.
+{{- if .Values.config.plugin.discover.kubernetes }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ template "fullname" . }}
+rules:
+- apiGroups: [""]                 # Empty string means Core API group
+  resources: ["endpoints"]        # Synse Server plugin discovery operates on Endpoint resources
+  verbs: ["get", "watch", "list"]
+{{- end }}
