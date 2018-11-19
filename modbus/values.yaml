@@ -7,7 +7,8 @@ replicaCount: 1
 image:
   registry: "" # Add a registry if we need to use the non-default one
   repository: vaporio/modbus-ip-plugin
-  tag: "1.1.0"
+  #tag: "1.1.0"
+  tag: "phoenix-4.0"
   pullPolicy: Always
 
 ## Service configurations for the modbus plugin.
@@ -46,7 +47,9 @@ config:
   settings:
     mode: serial # Parallel will overwhelm the VEM PLC.
     read:
-      interval: 5s
+      # interval: 5s
+      interval: 10s # We are beating up the PLC quite badly.
+      serialReadInterval: 1ms # Backoff between each serial read.
       write:
         enable: true
 
