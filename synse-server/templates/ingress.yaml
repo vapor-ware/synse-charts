@@ -10,7 +10,18 @@ metadata:
   annotations:
 {{ include "annotations" . | indent 4 }}
 spec:
+  {{- if .Values.ingress.hostname }}
+  rules:
+  - host: {{ .Values.ingress.hostname }}
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: {{ template "fullname" . }}
+          servicePort: {{ .Values.service.port }}
+  {{- else }}
   backend:
-    serviceName: {{ template "name" . }}
+    serviceName: {{ template "fullname" . }}
     servicePort: {{ .Values.service.port }}
+  {{- end }}
 {{- end }}
