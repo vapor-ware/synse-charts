@@ -23,10 +23,8 @@ ingress:
   annotations:
     kubernetes.io/ingress.class: nginx
     kubernetes.io/tls-acme: "true"
+  hostname: ""
   tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
 
 ## Configure resource requests and limits.
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/

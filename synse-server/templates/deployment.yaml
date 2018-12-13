@@ -30,7 +30,7 @@ spec:
       volumes:
       - name: config
         configMap:
-          name: {{ template "name" . }}-config
+          name: {{ template "fullname" . }}-config
       containers:
       - name: {{ .Chart.Name }}
         image: {{ .Values.image.registry }}{{ .Values.image.repository }}:{{ .Values.image.tag }}
