@@ -9,7 +9,16 @@ metadata:
 {{ include "labels" . | indent 4 }}
   annotations:
 {{ include "annotations" . | indent 4 }}
+{{ if .Values.ingress.annotations -}}
+{{ toYaml .Values.ingress.annotations | indent 4 -}}
+{{- end }}
 spec:
+  {{- if .Values.ingress.tls }}
+  tls:
+    - secretName: {{ template "fullname" . }}-tls
+      hosts:
+      {{ toYaml .Values.ingress.tls -}}
+  {{- end -}}
   {{- if .Values.ingress.hostname }}
   rules:
   - host: {{ .Values.ingress.hostname }}
