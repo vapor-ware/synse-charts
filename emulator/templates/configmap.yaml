@@ -1,3 +1,4 @@
+# Emulator plugin configuration
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -10,3 +11,17 @@ data:
   {{- if .Values.config }}
   config.yml: {{ toYaml .Values.config | quote }}
   {{- end }}
+{{ if .Values.devices }}
+---
+# Emulator device configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "name" . }}-devices
+  labels:
+{{ include "labels" . | indent 4 }}
+  annotations:
+{{ include "annotations" . | indent 4 }}
+data:
+  config.yml: {{ toYaml .Values.devices | quote }}
+{{- end }}

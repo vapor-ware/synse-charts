@@ -7,7 +7,7 @@ replicaCount: 1
 image:
   registry: "" # Add a registry if we need to use the non-default one
   repository: vaporio/emulator-plugin
-  tag: "2.2.0"
+  tag: "2.3.1"
   pullPolicy: Always
 
 ## Service configurations for the emulator plugin.
@@ -42,3 +42,8 @@ config:
   network:
     type: tcp
     address: "0.0.0.0:5001"
+
+## Synse Emulator device configurations. If no device configurations
+## are specified here, the emulator will use the default built-in
+## configurations.
+#devices: {}
