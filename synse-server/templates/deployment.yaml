@@ -31,6 +31,11 @@ spec:
       - name: config
         configMap:
           name: {{ template "fullname" . }}-config
+      {{- if and (not (contains "-slim" .Values.image.tag)) (.Values.devices) }}
+      - name: emulator-devices
+        configMap:
+          name: {{ template "fullname" . }}-emulator-devices
+      {{- end }}
       containers:
       - name: {{ .Chart.Name }}
         image: {{ .Values.image.registry }}{{ .Values.image.repository }}:{{ .Values.image.tag }}
@@ -54,9 +59,18 @@ spec:
           httpGet:
             path: /synse/test
             port: http
+        {{- if and (not (contains "-slim" .Values.image.tag)) (.Values.devices) }}
+        env:
+        - name: PLUGIN_DEVICE_CONFIG
+          value: /synse/emulator/tmp
+        {{- end }}
         volumeMounts:
         - name: config
           mountPath: /synse/config
+        {{- if and (not (contains "-slim" .Values.image.tag)) (.Values.devices) }}
+        - name: emulator-devices
+          mountPath: /synse/emulator/tmp
+        {{- end }}
         {{ if .Values.resources -}}
         resources:
 {{ toYaml .Values.resources | indent 10 }}
