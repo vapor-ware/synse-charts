@@ -24,6 +24,11 @@ spec:
       - name: config
         configMap:
           name: {{ template "name" . }}-config
+      {{- if .Values.devices }}
+      - name: device-config
+        configMap:
+          name: {{ template "name" . }}-devices
+      {{- end }}
       containers:
       - name: {{ .Chart.Name }}
         image: {{ .Values.image.registry }}{{ .Values.image.repository }}:{{ .Values.image.tag }}
@@ -40,9 +45,17 @@ spec:
         # configs will not get picked up.
         - name: PLUGIN_CONFIG
           value: /tmp/synse/plugin
+        {{- if .Values.devices}}
+        - name: PLUGIN_DEVICE_CONFIG
+          value: /tmp/synse/devices
+        {{- end }}
         volumeMounts:
         - name: config
           mountPath: /tmp/synse/plugin
+        {{- if .Values.devices }}
+        - name: device-config
+          mountPath: /tmp/synse/devices
+        {{- end }}
         {{- if .Values.resources }}
         resources:
 {{ toYaml .Values.resources | indent 10}}
