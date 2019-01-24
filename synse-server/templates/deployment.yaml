@@ -47,6 +47,11 @@ spec:
         {{- if .Values.args }}
         args: {{ .Values.args }}
         {{- end }}
+        # Allow tuning through env in values.yaml
+        {{- if .Values.env }}
+        env:
+{{ toYaml .Values.env | indent 10 -}}
+        {{- end -}}
         # Basic readiness/liveness probes. These could be expanded upon in the future.
         livenessProbe:
           initialDelaySeconds: 30
