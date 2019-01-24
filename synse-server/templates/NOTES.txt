@@ -1,3 +1,31 @@
+{{- if .Values.devices }}
+---------------------------------------
+Synse Server has been configured with device configurations that override
+the default built-in emulator configurations.
+
+Using '-slim' image: {{ if not (contains "-slim" .Values.image.tag) }}OK{{ else }}ERROR
+
+  The '-slim' variant of the Synse Server image is being used but does
+  not have the built-in emulator. Custom emulator device configurations
+  will NOT be rendered unless a non-slim image is used. Simply removing
+  the '-slim' suffix from the tag will give a version with built-in
+  emulator.
+
+{{- end }}
+
+Emulator enabled:    {{ if has "enable-emulator" .Values.args }}OK{{ else }}ERROR
+
+  The emulator has device configurations, but is not configured to run.
+  To run the built-in emulator, add the following in your values.yaml:
+
+    args:
+      - enable-emulator
+
+{{- end }}
+
+---------------------------------------
+{{- end }}
+
 Current Configuration:
 
 {{ toYaml .Values | indent 4 }}

@@ -1,7 +1,7 @@
 ---
 
 name: synse-server
-version: 0.3.0
+version: 0.3.1
 appVersion: 2.2.6
 description: An HTTP API for the monitoring and control of physical and virtual devices.
 home: https://github.com/vapor-ware/synse-server

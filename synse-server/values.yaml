@@ -39,6 +39,9 @@ resources:
 ## Component
 component: server
 
+## Arguments to pass to Synse Server. By default, no arguments are passed.
+args: []
+
 ## Synse Server configuration. This configuration is placed into a ConfigMap where
 ## it is then mounted into the container. The config options here can be overridden
 ## with environment variables, if desired. For more information on configuring Synse
@@ -62,3 +65,9 @@ config:
             # all plugins must have a service with the "component=plugin"
             # label set.
             component: plugin
+
+## Devices can be used to define an override device configuration for the built-in emulator.
+## This will only matter if you are using a non-slim variant of the Synse Server image. Be
+## sure to also run the emulator by setting:
+## args: ["enable-emulator"]
+#devices: {}
