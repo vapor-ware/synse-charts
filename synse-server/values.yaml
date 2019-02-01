@@ -9,7 +9,7 @@ image:
   repository: vaporio/synse-server
   # In general, all releases should use a *-slim image -- this is the image
   # without the baked-in emulator.
-  tag: "v2.2.6-slim"
+  tag: "v2.2.8-slim"
   pullPolicy: Always
 
 ## Service configurations for Synse Server.
