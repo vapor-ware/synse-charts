@@ -5,6 +5,7 @@ metadata:
   labels:
 {{ include "labels" . | indent 4 }}
   annotations:
+    checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
 {{ include "annotations" . | indent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
