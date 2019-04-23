@@ -24,11 +24,11 @@ spec:
       volumes:
       - name: config
         configMap:
-          name: {{ template "name" . }}-config
+          name: {{ template "fullname" . }}-config
       {{- if .Values.devices }}
       - name: device-config
         configMap:
-          name: {{ template "name" . }}-devices
+          name: {{ template "fullname" . }}-devices
       {{- end }}
       containers:
       - name: {{ .Chart.Name }}

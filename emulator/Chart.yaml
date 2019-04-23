@@ -1,7 +1,7 @@
 ---
 
 name: emulator
-version: 0.2.6
+version: 0.2.7
 appVersion: 2.4.4
 description: Emulator plugin for Synse Server.
 home: https://github.com/vapor-ware/synse-emulator-plugin
