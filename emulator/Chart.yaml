@@ -1,8 +1,8 @@
 ---
 
 name: emulator
-version: 0.2.12
-appVersion: 2.5.2
+version: 0.2.13
+appVersion: 2.5.3
 description: Emulator plugin for Synse Server.
 home: https://github.com/vapor-ware/synse-emulator-plugin
 icon: https://charts.vapor.io/.images/synse-emulator.jpg
@@ -11,3 +11,5 @@ maintainers:
   email: erick@vapor.io
 - name: Marco Ceppi
   email: marco@vapor.io
+- name: Charles Butler
+  email: chuck@vapor.io
