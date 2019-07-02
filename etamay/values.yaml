@@ -1,0 +1,23 @@
+---
+## Change the name of the resource
+## Default: use the chart name
+# nameOverride:
+
+pod:
+  pullSecret: ""
+  etamay:
+    image: vaporio/etamay:v0.1.0
+    pullPolicy: "Always"
+    securityContext:
+      privileged: false
+
+config: {}
+
+deployment:
+  replicas: 2
+
+ingress:
+  enabled: false
+  domain:
+  annotations:
+  tls: false
