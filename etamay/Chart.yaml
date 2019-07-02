@@ -1,0 +1,9 @@
+name: etamay
+version: 1.0.0
+appVersion: 0.1.0
+description: A dynamic metadata service
+home: https://github.com/vapor-ware/etamay
+icon: https://charts.vapor.io/.images/etamay-sm.png
+maintainers:
+- name: Marco Ceppi
+  email: marco@vapor.io

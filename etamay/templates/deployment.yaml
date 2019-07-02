@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ template "etamay.fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+  name: {{ template "etamay.fullname" . }}
+spec:
+  replicas: {{ default 2 .Values.deployment.replicas }}
+  selector:
+    matchLabels:
+      app: {{ template "etamay.fullname" . }}
+      release: "{{ .Release.Name }}"
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: "RollingUpdate"
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Chart.Name "/templates/configmap.yaml") . | sha256sum }}
+      labels:
+        app: {{ template "etamay.fullname" . }}
+        release: "{{ .Release.Name }}"
+    spec:
+     {{- if .Values.pod.pullSecret }}
+      imagePullSecrets:
+       - name: {{ .Values.pod.pullSecret }}
+     {{- end }}
+      containers:
+        - name: etamay
+          image: {{ .Values.pod.etamay.image | quote }}
+          imagePullPolicy: {{ default "Always" .Values.pod.etamay.pullPolicy | quote }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/etamay
+      volumes:
+      - name: config
+        configMap:
+          name: {{ template "etamay.fullname" . }}
