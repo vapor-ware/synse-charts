@@ -1,25 +1,12 @@
+{{- if .Values.config }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ template "fullname" . }}-config
   labels:
-{{ include "labels" . | indent 4 }}
+    {{- include "labels" . | nindent 4 }}
   annotations:
-{{ include "annotations" . | indent 4 }}
+    {{- include "annotations" . | nindent 4 }}
 data:
-  {{- if .Values.config }}
   config.yml: {{ toYaml .Values.config | quote }}
-  {{- end }}
-{{- if and (not (contains "-slim" .Values.image.tag)) (.Values.devices) }}
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ template "fullname" . }}-emulator-devices
-  labels:
-{{ include "labels" . | indent 4 }}
-  annotations:
-{{ include "annotations" . | indent 4 }}
-data:
-  config.yml: {{ toYaml .Values.devices | quote }}
 {{- end }}

@@ -3,9 +3,9 @@ kind: Service
 metadata:
   name: {{ template "fullname" . }}
   labels:
-{{ include "labels" . | indent 4 }}
+    {{- include "labels" . | nindent 4 }}
   annotations:
-{{ include "annotations" . | indent 4 }}
+    {{- include "annotations" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -13,4 +13,4 @@ spec:
     targetPort: http
     name: http
   selector:
-{{ include "selector" . | indent 4 }}
+    {{- include "selector" . | nindent 4 }}
