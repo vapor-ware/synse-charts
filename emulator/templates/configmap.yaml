@@ -1,27 +1,31 @@
-# Emulator plugin configuration
+{{- if (or .Values.config .Values.devices) }}
+{{ if .Values.config }}
+# Plugin configuration
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ template "fullname" . }}-config
   labels:
-{{ include "labels" . | indent 4 }}
+    synse-component: plugin
+    {{- include "labels" . | nindent 4 }}
   annotations:
-{{ include "annotations" . | indent 4 }}
+    {{- include "annotations" . | nindent 4 }}
 data:
-  {{- if .Values.config }}
   config.yml: {{ toYaml .Values.config | quote }}
-  {{- end }}
+{{- end }}
 {{ if .Values.devices }}
 ---
-# Emulator device configuration
+# Device configuration
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ template "fullname" . }}-devices
   labels:
-{{ include "labels" . | indent 4 }}
+    synse-component: plugin
+    {{- include "labels" . | nindent 4 }}
   annotations:
-{{ include "annotations" . | indent 4 }}
+    {{- include "annotations" . | nindent 4 }}
 data:
   config.yml: {{ toYaml .Values.devices | quote }}
+{{- end }}
 {{- end }}
