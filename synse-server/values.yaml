@@ -1,35 +1,37 @@
-# Default values for Synse Server.
+# Default values for synse-server.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+## Deployment replication configuration.
 replicaCount: 1
 
 # Override the serialized names which are typically $release-name-$app
 fullNameOverride: ""
 
+## Image configuration options.
 image:
   registry: "" # Add a registry if we need to use the non-default one
   repository: vaporio/synse-server
-  # In general, all releases should use a *-slim image -- this is the image
-  # without the baked-in emulator.
-  tag: "v2.2.9-slim"
+  tag: "v3.0.0-alpha.1"
   pullPolicy: Always
 
-## Service configurations for Synse Server.
+## Service configuration options.
 ## ref: http://kubernetes.io/docs/user-guide/services/
 service:
   type: ClusterIP
   port: 5000
 
+## Ingress configuration options.
+## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ingress:
-  enabled: true
+  enabled: false
   annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hostname: ""
   tls: []
 
-## Allow pass-through env variable configuration of synse server
+## Allow pass-through environment variable configuration.
 #env: {}
 
 ## Configure resource requests and limits.
@@ -39,38 +41,37 @@ resources:
    cpu: 33m
    memory: 150Mi
 
-## Component
-component: server
-
-## Arguments to pass to Synse Server. By default, no arguments are passed.
+## Specify arguments to pass to the container. By default, no arguments are passed.
 args: []
+
+## Readiness and liveness probe configuration options
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  timeoutSeconds: 5
+  periodSeconds: 5
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 5
+  timeoutSeconds: 2
+  periodSeconds: 5
+
 
 ## Synse Server configuration. This configuration is placed into a ConfigMap where
 ## it is then mounted into the container. The config options here can be overridden
 ## with environment variables, if desired. For more information on configuring Synse
-## Server, see: https://synse-server.readthedocs.io/en/latest/user/configuration.html#configuring-synse-server
+## Server, see: https://synse.readthedocs.io/en/latest/server/user/configuration/
+##
+## The default behavior for the Synse chart, as defined below, is to automatically
+## look for plugins based on Kubernetes endpoint labels, specifically the label:
+## component: plugin
 config:
   logging: debug
   pretty_json: true
-
-  # For our deployments, we'll enable plugin discovery via
-  # kubernetes service endpoints.
   plugin:
     discover:
       kubernetes:
         endpoints:
           labels:
-            # FIXME (etd): a while back we discussed keying this off of
-            # two labels, "app=synse" and "component=plugin". Right now,
-            # the "app" label defaults to the name of the service (e.g.
-            # i2c), so we can't use that. for now, we'll only key off of
-            # the "component" key. For Synse Server to find the plugin,
-            # all plugins must have a service with the "component=plugin"
-            # label set.
-            component: plugin
-
-## Devices can be used to define an override device configuration for the built-in emulator.
-## This will only matter if you are using a non-slim variant of the Synse Server image. Be
-## sure to also run the emulator by setting:
-## args: ["enable-emulator"]
-#devices: {}
+            synse-component: plugin

@@ -1,13 +1,15 @@
-# Default values for the Emulator plugin.
+# Default values for synse-emulator-plugin.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+## Deployment replication configuration.
 replicaCount: 1
 
+## Image configuration options.
 image:
   registry: "" # Add a registry if we need to use the non-default one
   repository: vaporio/emulator-plugin
-  tag: "2.5.3"
+  tag: "3.0.0-alpha.1"
   pullPolicy: Always
 
 ## Service configurations for the emulator plugin.
@@ -32,16 +34,28 @@ resources:
 #args: ["--debug"]
 args: []
 
-## Component type
-component: plugin
+## Readiness and liveness probe configuration options
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  timeoutSeconds: 5
+  periodSeconds: 5
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 5
+  timeoutSeconds: 2
+  periodSeconds: 5
 
 ## Synse Emulator Plugin configuration.
-config:
-  version: 1.1
-  debug: true
-  network:
-    type: tcp
-    address: "0.0.0.0:5001"
+## The emulator plugin image comes pre-built with a default sane configuration.
+## The block below may be uncommented if a custom configuration is desired.
+#config:
+#  version: 3
+#  debug: true
+#  network:
+#    type: tcp
+#    address: ":5001"
 
 ## Synse Emulator device configurations. If no device configurations
 ## are specified here, the emulator will use the default built-in

@@ -3,32 +3,39 @@ kind: Deployment
 metadata:
   name: {{ template "fullname" . }}
   labels:
-{{ include "labels" . | indent 4 }}
+    synse-component: plugin
+    {{- include "labels" . | nindent 4 }}
   annotations:
-{{ include "annotations" . | indent 4 }}
+    {{- include "annotations" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-{{ include "selector" . | indent 6 }}
+      synse-component: plugin
+      {{- include "selector" . | nindent 6 }}
   template:
     metadata:
       name: {{ template "fullname" . }}
       labels:
-{{ include "labels" . | indent 8 }}
+        synse-component: plugin
+        {{- include "labels" . | nindent 8 }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
-{{ include "annotations" . | indent 8 }}
+        {{- include "annotations" . | nindent 8 }}
     spec:
       terminationGracePeriodSeconds: 3
+      {{- if (or .Values.config .Values.devices) }}
       volumes:
-      - name: config
-        configMap:
-          name: {{ template "fullname" . }}-config
-      {{- if .Values.devices }}
-      - name: device-config
-        configMap:
-          name: {{ template "fullname" . }}-devices
+        {{- if .Values.config }}
+        - name: config
+          configMap:
+            name: {{ template "fullname" . }}-config
+        {{- end }}
+        {{- if .Values.devices }}
+        - name: device-config
+          configMap:
+            name: {{ template "fullname" . }}-devices
+        {{- end }}
       {{- end }}
       containers:
       - name: {{ .Chart.Name }}
@@ -40,24 +47,56 @@ spec:
         {{- if .Values.args }}
         args: {{ .Values.args }}
         {{- end }}
+        {{- if (or .Values.config .Values.devices) }}
         env:
         # We need to manually specify a non-default path here. If we
         # mount the config to the default path, the built-in emulator
         # configs will not get picked up.
+        {{- if .Values.config }}
         - name: PLUGIN_CONFIG
           value: /tmp/synse/plugin
+        {{- end }}
         {{- if .Values.devices}}
         - name: PLUGIN_DEVICE_CONFIG
           value: /tmp/synse/devices
         {{- end }}
+        {{- end }}
+        {{- if (or .Values.config .Values.devices) }}
         volumeMounts:
+        {{- if .Values.config }}
         - name: config
           mountPath: /tmp/synse/plugin
+        {{- end }}
         {{- if .Values.devices }}
         - name: device-config
           mountPath: /tmp/synse/devices
         {{- end }}
+        {{- end }}
+        {{- if .Values.livenessProbe.enabled }}
+        {{- with .Values.livenessProbe }}
+        livenessProbe:
+          initialDelaySeconds: {{ .initialDelaySeconds }}
+          timeoutSeconds: {{ .timeoutSeconds }}
+          periodSeconds: {{ .periodSeconds }}
+          exec:
+            command:
+              - /bin/exists
+              - /etc/synse/plugin/healthy
+        {{- end }}
+        {{- end }}
+        {{- if .Values.readinessProbe.enabled }}
+        {{- with .Values.readinessProbe }}
+        readinessProbe:
+          initialDelaySeconds: {{ .initialDelaySeconds }}
+          timeoutSeconds: {{ .timeoutSeconds }}
+          periodSeconds: {{ .periodSeconds }}
+          exec:
+            command:
+              - /bin/exists
+              - /etc/synse/plugin/healthy
+        {{- end }}
+        {{- end }}
         {{- if .Values.resources }}
         resources:
-{{ toYaml .Values.resources | indent 10}}
+          {{- toYaml .Values.resources | nindent 10}}
         {{- end -}}
