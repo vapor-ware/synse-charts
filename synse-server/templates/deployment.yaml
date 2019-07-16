@@ -21,7 +21,7 @@ spec:
         {{- include "annotations" . | nindent 8 }}
     spec:
       terminationGracePeriodSeconds: 3
-      {{- if .Values.config.plugin.discover.kubernetes }}
+      {{- if .Values.clusterRoles.enabled }}
       # Synse Server is configured to run with plugin discovery using the Kubernetes
       # API. Use the ServiceAccount to give it the proper cluster permissions.
       serviceAccountName: {{ template "fullname" . }}
@@ -73,7 +73,7 @@ spec:
         {{- if .Values.config }}
         volumeMounts:
         - name: config
-          mountPath: /synse/config
+          mountPath: /etc/synse/server
         {{- end }}
         {{ if .Values.resources -}}
         resources:

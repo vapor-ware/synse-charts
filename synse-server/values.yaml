@@ -5,14 +5,23 @@
 ## Deployment replication configuration.
 replicaCount: 1
 
-# Override the serialized names which are typically $release-name-$app
+## Override the serialized names which are typically $release-name-$app
 fullNameOverride: ""
+
+## Enable/disable the creation of a ClusterRole, ClusterRoleBinding, and
+## ServiceAccount. This is false by default, as Synse does not need additional
+## permissions with its default settings.
+##
+## If Synse Server is configured for plugin discovery via the Kubernetes API,
+## this must be enabled.
+clusterRoles:
+  enabled: false
 
 ## Image configuration options.
 image:
   registry: "" # Add a registry if we need to use the non-default one
   repository: vaporio/synse-server
-  tag: "v3.0.0-alpha.1"
+  tag: "v3.0.0-alpha.2"
   pullPolicy: Always
 
 ## Service configuration options.
@@ -62,16 +71,4 @@ readinessProbe:
 ## it is then mounted into the container. The config options here can be overridden
 ## with environment variables, if desired. For more information on configuring Synse
 ## Server, see: https://synse.readthedocs.io/en/latest/server/user/configuration/
-##
-## The default behavior for the Synse chart, as defined below, is to automatically
-## look for plugins based on Kubernetes endpoint labels, specifically the label:
-## component: plugin
-config:
-  logging: debug
-  pretty_json: true
-  plugin:
-    discover:
-      kubernetes:
-        endpoints:
-          labels:
-            synse-component: plugin
+# config: {}
