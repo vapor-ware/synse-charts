@@ -21,7 +21,7 @@ clusterRoles:
 image:
   registry: "" # Add a registry if we need to use the non-default one
   repository: vaporio/synse-server
-  tag: "v3.0.0-alpha.3"
+  tag: "v3.0.0-alpha.5"
   pullPolicy: Always
 
 ## Service configuration options.
