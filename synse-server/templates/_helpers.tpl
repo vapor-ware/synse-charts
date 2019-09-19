@@ -1,5 +1,4 @@
 {{/* vim: set filetype=mustache: */}}
-
 {{/*
   Expand the name of the chart.
 */}}
@@ -14,29 +13,20 @@
 */}}
 {{- define "fullname" -}}
 {{- if .Values.fullnameOverride -}}
-{{- printf .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
 {{- $name := default .Chart.Name .Values.nameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
 {{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 {{- end -}}
-
-{{/*
-  Output the common labels used.
-*/}}
-{{- define "labels" -}}
-{{ template "selector" . }}
-heritage: {{ .Release.Service | quote }}
-{{- end -}}
-
-{{- define "annotations" -}}
-chart: "{{ .Chart.Name }}"
 {{- end -}}
 
 {{/*
-  Selector to pick a specific release/app.
+  Create chart name and version as used by the chart label.
 */}}
-{{- define "selector" -}}
-app: {{ include "name" . | quote }}
-release: {{ .Release.Name | quote }}
+{{- define "chart" -}}
+{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}

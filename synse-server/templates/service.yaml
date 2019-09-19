@@ -3,14 +3,22 @@ kind: Service
 metadata:
   name: {{ template "fullname" . }}
   labels:
-    {{- include "labels" . | nindent 4 }}
+    app: {{ template "name" . }}
+    chart: {{ template "chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    {{- if .Values.service.labels }}
+    {{- toYaml .Values.service.labels | trim | nindent 4 }}
+    {{- end }}
+  {{- if .Values.service.annotations }}
   annotations:
-    {{- include "annotations" . | nindent 4 }}
+    {{- toYaml .Values.service.annotations | trim | nindent 4 }}
+  {{- end }}
 spec:
   type: {{ .Values.service.type }}
   ports:
   - port: {{ .Values.service.port }}
-    targetPort: http
     name: http
   selector:
-    {{- include "selector" . | nindent 4 }}
+    app: {{ template "name" . }}
+    release: {{ .Release.Name }}

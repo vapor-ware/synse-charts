@@ -4,9 +4,10 @@ kind: ConfigMap
 metadata:
   name: {{ template "fullname" . }}-config
   labels:
-    {{- include "labels" . | nindent 4 }}
-  annotations:
-    {{- include "annotations" . | nindent 4 }}
+    app: {{ template "name" . }}
+    chart: {{ template "chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 data:
   config.yml: {{ toYaml .Values.config | quote }}
 {{- end }}

@@ -3,13 +3,25 @@
   via the Kubernetes API is configured.
 */ -}}
 
-{{- if .Values.clusterRoles.enabled }}
+{{- if .Values.rbac.create }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: {{ template "fullname" . }}
+  labels:
+    app: {{ template "name" . }}
+    chart: {{ template "chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 rules:
-- apiGroups: [""]                 # Empty string means Core API group
-  resources: ["endpoints"]        # Synse Server plugin discovery operates on Endpoint resources
-  verbs: ["get", "watch", "list"]
+# Core API Group
+- apiGroups: [""]
+  # Synse Server plugin discovery currently operates on Endpoint resources.
+  # If support for more resources is added, this should be updated accordingly.
+  resources:
+  - "endpoints"
+  verbs:
+  - "get"
+  - "watch"
+  - "list"
 {{- end }}
