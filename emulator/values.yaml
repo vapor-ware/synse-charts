@@ -2,15 +2,30 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-## Deployment replication configuration.
-replicaCount: 1
+
+## Partially override the fullname template (will maintain the release name).
+nameOverride: ""
+
+## Fully override the fullname template.
+fullnameOverride: ""
 
 ## Image configuration options.
 image:
   registry: "" # Add a registry if we need to use the non-default one
   repository: vaporio/emulator-plugin
-  tag: "3.0.0-alpha.5"
+  tag: "3.0.0-alpha.8"
   pullPolicy: Always
+
+## Deployment configuration options.
+deployment:
+  annotations: {}
+  labels: {}
+  replicas: 1
+
+## Pod configuration options.
+pod:
+  annotations: {}
+  labels: {}
 
 ## Service configurations for the emulator plugin.
 ## ref: http://kubernetes.io/docs/user-guide/services/
@@ -18,21 +33,9 @@ image:
 ## The port here should match the network address in the
 ## plugin configuration, below.
 service:
-  type: "clusterIP: None"
+  annotations: {}
+  labels: {}
   port: 5001
-
-## Configure resource requests and limits.
-## ref: http://kubernetes.io/docs/user-guide/compute-resources/
-resources:
-  requests:
-   cpu: 33m
-   memory: 150Mi
-
-## Pass arguments to the plugin container. For additional startup
-## logging, you can pass the --debug flag. By default, no additional
-## arguments are passed to the container.
-#args: ["--debug"]
-args: []
 
 ## Readiness and liveness probe configuration options
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/
@@ -47,6 +50,33 @@ readinessProbe:
   timeoutSeconds: 2
   periodSeconds: 5
 
+## Pass arguments to the plugin container. For additional startup
+## logging, you can pass the --debug flag. By default, no additional
+## arguments are passed to the container.
+#args: ["--debug"]
+args: []
+
+## Allow pass-through environment variable configuration.
+env: {}
+
+## Configure resource requests and limits.
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+resources:
+  requests: {}
+  limits: {}
+
+## Node labels for pod assignment
+## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+nodeSelector: {}
+
+## Tolerations for pod assignment
+## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+tolerations: []
+
+## Affinity for pod assignment
+## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+affinity: {}
+
 ## Synse Emulator Plugin configuration.
 ## The emulator plugin image comes pre-built with a default sane configuration.
 ## The block below may be uncommented if a custom configuration is desired.
@@ -56,8 +86,9 @@ readinessProbe:
 #  network:
 #    type: tcp
 #    address: ":5001"
+config: {}
 
 ## Synse Emulator device configurations. If no device configurations
 ## are specified here, the emulator will use the default built-in
 ## configurations.
-#devices: {}
+devices: {}

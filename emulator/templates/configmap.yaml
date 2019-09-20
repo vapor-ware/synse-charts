@@ -1,5 +1,5 @@
 {{- if (or .Values.config .Values.devices) }}
-{{ if .Values.config }}
+{{- if .Values.config }}
 # Plugin configuration
 apiVersion: v1
 kind: ConfigMap
@@ -7,14 +7,16 @@ metadata:
   name: {{ template "fullname" . }}-config
   labels:
     synse-component: plugin
-    {{- include "labels" . | nindent 4 }}
-  annotations:
-    {{- include "annotations" . | nindent 4 }}
+    app: {{ template "name" . }}
+    chart: {{ template "chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 data:
   config.yml: {{ toYaml .Values.config | quote }}
 {{- end }}
-{{ if .Values.devices }}
+{{- if .Values.devices }}
 ---
+
 # Device configuration
 apiVersion: v1
 kind: ConfigMap
@@ -22,9 +24,10 @@ metadata:
   name: {{ template "fullname" . }}-devices
   labels:
     synse-component: plugin
-    {{- include "labels" . | nindent 4 }}
-  annotations:
-    {{- include "annotations" . | nindent 4 }}
+    app: {{ template "name" . }}
+    chart: {{ template "chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 data:
   config.yml: {{ toYaml .Values.devices | quote }}
 {{- end }}
