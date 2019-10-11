@@ -47,7 +47,7 @@ The following table lists the configurable parameters of the Synse Server chart 
 | `rbac.create` | Create RBAC resources and a ServiceAccount for the Synse Server deployment to use. This must be done if Synse Server is configured to use plugin discovery via Kubernetes endpoints. | `false` |
 | `image.registry` | The image registry to use. | `""` |
 | `image.repository` | The name of the image to use. | `vaporio/synse-server` |
-| `image.tag` | The tag of the image to use. | `v3.0.0-alpha.8` |
+| `image.tag` | The tag of the image to use. | `v3.0.0-alpha.9` |
 | `image.pullPolicy` | The image pull policy. | `Always` |
 | `deployment.labels` | Additional labels for the Deployment. | `{}` |
 | `deployment.annotations` | Additional annotations for the Deployment. | `{}` |
