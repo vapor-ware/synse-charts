@@ -21,6 +21,11 @@ spec:
   - port: {{ .Values.service.port }}
     targetPort: http
     name: http
+  {{- if .Values.metrics.enabled }}
+  - port: 2112
+    targetPort: metrics
+    name: metrics
+  {{- end }}
   selector:
     synse-component: plugin
     app: {{ template "name" . }}
