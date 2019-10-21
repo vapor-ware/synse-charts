@@ -60,13 +60,19 @@ spec:
         ports:
         - name: http
           containerPort: {{ .Values.service.port }}
+        {{- if .Values.metrics.enabled }}
+        - name: metrics
+          containerPort: 2112
+        {{- end }}
         {{- if .Values.args }}
         args: {{ .Values.args }}
         {{- end }}
-        {{- if .Values.env }}
         env:
+          - name: PLUGIN_METRICS_ENABLED
+            value: {{ .Values.metrics.enabled | quote }}
+          {{- if .Values.env }}
           {{- toYaml .Values.env | trim | nindent 10 }}
-        {{- end }}
+          {{- end }}
         {{- if (or .Values.config .Values.devices) }}
         volumeMounts:
         {{- if .Values.config }}
