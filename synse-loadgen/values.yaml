@@ -1,0 +1,54 @@
+# Default values for synse-loadgen.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+## Partially override the fullname template (will maintain the release name).
+nameOverride: ""
+
+## Fully override the fullname template.
+fullnameOverride: ""
+
+## Image configuration options.
+image:
+  registry: "" # Add a registry if we need to use the non-default one
+  repository: vaporio/synse-loadgen
+  tag: "0.1.0"
+  pullPolicy: Always
+
+## Deployment configuration options.
+deployment:
+  annotations: {}
+  labels: {}
+  replicas: 1
+
+## Pod configuration options.
+pod:
+  annotations: {}
+  labels: {}
+
+## Allow pass-through environment variable configuration.
+env: {}
+
+## Configure resource requests and limits.
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+resources:
+  requests: {}
+  limits: {}
+
+## Node labels for pod assignment
+## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+nodeSelector: {}
+
+## Tolerations for pod assignment
+## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+tolerations: []
+
+## Affinity for pod assignment
+## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+affinity: {}
+
+## Synse LoadGen configuration. This configuration is placed into a ConfigMap where
+## it is then mounted into the container. The config options here can be overridden
+## with environment variables, if desired. For more information, see:
+## https://github.com/vapor-ware/synse-loadgen#configuring
+config: {}
