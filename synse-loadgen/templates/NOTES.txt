@@ -1,0 +1,3 @@
+{{ .Chart.Name }}
+  chart: {{ .Chart.Version }}
+  app:   {{ .Chart.AppVersion }}
