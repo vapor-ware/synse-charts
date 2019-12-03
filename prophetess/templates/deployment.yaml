@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ template "prophetess.fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+  name: {{ template "prophetess.fullname" . }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ template "prophetess.fullname" . }}
+      release: "{{ .Release.Name }}"
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: "RollingUpdate"
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Chart.Name "/templates/configmap.yaml") . | sha256sum }}
+      labels:
+        app: {{ template "prophetess.fullname" . }}
+        release: "{{ .Release.Name }}"
+    spec:
+     {{- if .Values.pod.pullSecret }}
+      imagePullSecrets:
+       - name: {{ .Values.pod.pullSecret }}
+     {{- end }}
+      containers:
+        - name: prophetess
+          image: {{ .Values.pod.prophetess.image | quote }}
+          imagePullPolicy: {{ default "Always" .Values.pod.prophetess.pullPolicy | quote }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/prophetess
+      volumes:
+      - name: config
+        configMap:
+          name: {{ template "prophetess.fullname" . }}

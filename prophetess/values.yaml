@@ -1,0 +1,26 @@
+---
+## Change the name of the resource
+## Default: use the chart name
+# nameOverride:
+
+pod:
+  pullSecret: ""
+  prophetess:
+    image: vaporio/prophetess:0.1.0
+    pullPolicy: "Always"
+    securityContext:
+      privileged: false
+
+prophetess:
+  config: {}
+  port: 8080
+  debug: false
+
+service:
+  port: 80
+
+ingress:
+  enabled: false
+  domain:
+  annotations:
+  tls: false
