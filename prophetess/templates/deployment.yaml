@@ -17,11 +17,11 @@ spec:
     rollingUpdate:
       maxSurge: 1
       maxUnavailable: 1
-    type: "RollingUpdate"
+    type: RollingUpdate
   template:
     metadata:
       annotations:
-        checksum/config: {{ include (print $.Chart.Name "/templates/configmap.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
       labels:
         app: {{ template "prophetess.fullname" . }}
         release: "{{ .Release.Name }}"
