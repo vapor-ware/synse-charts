@@ -1,7 +1,7 @@
 apiVersion: v1
 name: prophetess
 version: 1.0.0
-appVersion: 0.1.0
+appVersion: 0.2.0
 description: A tool for extracting data from extractors, transforming that data and loading it into loaders.
 home: https://github.com/vapor-ware/prophetess
 icon: https://charts.vapor.io/.images/prophetess.png
