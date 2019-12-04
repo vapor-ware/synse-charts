@@ -1,0 +1,30 @@
+{{- if .Values.ingress.enabled -}}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ template "prophetess.fullname" . }}
+  labels:
+    app: {{ template "prophetess.fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+{{ if .Values.ingress.annotations -}}
+  annotations:
+{{ toYaml .Values.ingress.annotations | indent 4 -}}
+{{- end }}
+spec:
+  rules:
+    - host: {{ .Values.ingress.domain }}
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: {{ template "prophetess.fullname" . }}
+              servicePort: {{ default 80 .Values.service.port }}
+{{ if .Values.ingress.tls }}
+  tls:
+    - hosts:
+        - {{ .Values.ingress.domain }}
+      secretName: {{ .Values.ingress.domain }}-tls
+{{- end }}
+{{- end }}
