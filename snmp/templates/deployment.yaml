@@ -17,6 +17,7 @@ spec:
       labels:
 {{ include "labels" . | indent 8 }}
       annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
 {{ include "annotations" . | indent 8 }}
     spec:
       # Setting the hostname because the UPSs only take communications from specific hostnames.
