@@ -42,7 +42,7 @@ The following table lists the configurable parameters of the Synse Emulator Plug
 | Parameter | Description | Default |
 | :-------- | :---------- | :------ |
 | `config` | The Emulator Plugin configuration. | `{}` |
-| `devices` | Custom emulator devices configuration. If this is not set, the default built-in device configs are used.| `{}` |
+| `devices` | Custom emulator devices configuration. If this is not set, the default built-in device configs are used. | `{}` |
 | `nameOverride` | Partially override the fullname template (will maintain the release name). | `""` |
 | `fullnameOverride` | Fully override the fullname template. | `""` |
 | `metrics.enabled` | Enable/disable application metrics export (via Prometheus) at `:2112/metrics`. | `false` |

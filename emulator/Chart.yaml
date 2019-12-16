@@ -6,7 +6,7 @@ description: A Synse plugin providing emulated devices and reading data
 home: https://github.com/vapor-ware/synse-emulator-plugin
 icon: https://charts.vapor.io/.images/synse-emulator.jpg
 sources:
-  - https://github.com/vapor-ware/synse-emulator-plugin
+  - https://github.com/vapor-ware/synse-emulator-plugin.git
 maintainers:
   - name: Erick Daniszewski
     email: erick@vapor.io
@@ -14,4 +14,3 @@ maintainers:
     email: marco@vapor.io
   - name: Charles Butler
     email: chuck@vapor.io
-engine: gotpl
