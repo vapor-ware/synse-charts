@@ -2,28 +2,56 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-replicaCount: 1
 
+## Partially override the fullname template (will maintain the release name).
+nameOverride: ""
+
+## Fully override the fullname template.
+fullnameOverride: ""
+
+## Image configuration options.
 image:
   registry: "" # Add a registry if we need to use the non-default one
   repository: vaporio/modbus-ip-plugin
-  tag: "1.1.1"
+  tag: "3.0.0-alpha.1"
   pullPolicy: Always
 
-## Service configurations for the modbus plugin.
+## Enable/disable application metrics export via Prometheus.
+metrics:
+  enabled: false
+
+## Deployment configuration options.
+deployment:
+  annotations: {}
+  labels: {}
+  replicas: 1
+
+## Pod configuration options.
+pod:
+  annotations: {}
+  labels: {}
+
+## Service configuration options.
 ## ref: http://kubernetes.io/docs/user-guide/services/
 ##
 ## The port defined here should match the plugin configuration, below.
 service:
-  type: "clusterIP: None"
+  annotations: {}
+  labels: {}
   port: 5004
 
-## Configure resource requests and limits.
-## ref: http://kubernetes.io/docs/user-guide/compute-resources/
-resources:
-  requests:
-    cpu: 33m
-    memory: 150Mi
+## Readiness and liveness probe configuration options
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  timeoutSeconds: 5
+  periodSeconds: 5
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 5
+  timeoutSeconds: 2
+  periodSeconds: 5
 
 ## Pass arguments to the plugin container. For additional startup
 ## logging, you can pass the --debug flag. By default, no additional
@@ -31,26 +59,44 @@ resources:
 #args: ["--debug"]
 args: []
 
-## Component type
-component: plugin
+## Allow pass-through environment variable configuration.
+env: {}
 
-## Default plugin configuration. If a deployment needs to modify the plugin config, it will
-## need to specify the whole config -- it cannot just override single fields.
+## Configure resource requests and limits.
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+resources:
+  requests: {}
+  limits: {}
+
+## Node labels for pod assignment
+## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+nodeSelector: {}
+
+## Tolerations for pod assignment
+## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+tolerations: []
+
+## Affinity for pod assignment
+## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+affinity: {}
+
+## Plugin configuration
+## The configuration below specifies a basic default configuration for the plugin.
+## Deployments which require anything different than this basic configuration will
+## need to specify their own config wholesale - single fields may not be overridden
+## from this config block.
 config:
-  version: 1.1
+  version: 3
   debug: true
-  # The network info here should match the Service configuration
   network:
     type: tcp
-    address: "0.0.0.0:5004"
+    address: ":5004"
   settings:
-    mode: serial # Parallel will overwhelm the VEM PLC.
+    mode: serial
     read:
       interval: 5s
-      write:
-        enable: true
 
 ## Device configuration
-## Each site should define its own device configuration since this may
-## change from site to site depending on what is actually deployed.
+## Each instance should define its own device configuration. This may be different
+## per deployment depending on what physical assets are available.
 devices: {}
