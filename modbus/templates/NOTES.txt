@@ -1,3 +1,3 @@
-Current Configuration:
-
-{{ toYaml .Values | indent 4 }}
+{{ .Chart.Name }}
+  chart: {{ .Chart.Version }}
+  app:   {{ .Chart.AppVersion }}

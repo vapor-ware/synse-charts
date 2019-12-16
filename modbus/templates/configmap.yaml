@@ -1,27 +1,34 @@
-# Modbus TCP/IP plugin configuration
+{{- if (or .Values.config .Values.devices) }}
+{{- if .Values.config }}
+# Plugin configuration
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "name" . }}-plugin
+  name: {{ template "fullname" . }}-config
   labels:
-{{ include "labels" . | indent 4 }}
-  annotations:
-{{ include "annotations" . | indent 4 }}
+    synse-component: plugin
+    app: {{ template "name" . }}
+    chart: {{ template "chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 data:
-  {{- if .Values.config }}
   config.yml: {{ toYaml .Values.config | quote }}
-  {{- end }}
+{{- end }}
+{{- if .Values.devices }}
 ---
-# Modbus TCP/IP device configuration
+
+# Device configuration
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "name" . }}-devices
+  name: {{ template "fullname" . }}-devices
   labels:
-{{ include "labels" . | indent 4 }}
-  annotations:
-{{ include "annotations" . | indent 4 }}
+    synse-component: plugin
+    app: {{ template "name" . }}
+    chart: {{ template "chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 data:
-  {{- if .Values.devices }}
   config.yml: {{ toYaml .Values.devices | quote }}
-  {{- end }}
+{{- end }}
+{{- end }}
