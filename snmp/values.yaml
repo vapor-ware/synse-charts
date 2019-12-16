@@ -2,30 +2,61 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-## The SNMP plugin should only have one instance per Chamber.
-## Do not change this value.
-replicaCount: 1
+## Partially override the fullname template (will maintain the release name).
+nameOverride: ""
 
+## Fully override the fullname template.
+fullnameOverride: ""
+
+## Image configuration options.
 image:
   registry: "" # Add a registry if we need to use the non-default one
   repository: vaporio/snmp-plugin
-  tag: 1.2.0
+  tag: "3.0.0-alpha.1"
   pullPolicy: Always
 
-## Service configurations for the SNMP plugin.
+## Enable/disable application metrics export via Prometheus.
+metrics:
+  enabled: false
+
+## Deployment configuration options.
+deployment:
+  annotations: {}
+  labels: {}
+  replicas: 1
+
+## Pod configuration options.
+pod:
+  annotations: {}
+  labels: {}
+  hostname: ""
+
+  ## Privilege and access control settings for the Pod
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  securityContext:
+    privileged: false
+
+## Service configuration options.
 ## ref: http://kubernetes.io/docs/user-guide/services/
 ##
 ## The port defined here should match the plugin configuration, below.
 service:
-  type: "clusterIP: None"
+  annotations: {}
+  labels: {}
   port: 5003
 
-## Configure resource requests and limits.
-## ref: http://kubernetes.io/docs/user-guide/compute-resources/
-resources:
-  requests:
-   cpu: 33m
-   memory: 150Mi
+## Readiness and liveness probe configuration options
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  timeoutSeconds: 5
+  periodSeconds: 5
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 5
+  timeoutSeconds: 2
+  periodSeconds: 5
 
 ## Pass arguments to the plugin container. For additional startup
 ## logging, you can pass the --debug flag. By default, no additional
@@ -33,32 +64,54 @@ resources:
 #args: ["--debug"]
 args: []
 
-# Component
-component: plugin
+## Allow pass-through environment variable configuration.
+env: {}
 
-## Plugin Configuration
-## If the plugin will use dynamic configuration, this config should be
-## overridden at the site-level, where the site-specific dynamic config
-## can be specified under the `dynamicRegistration` field. For an example,
-## see: https://github.com/vapor-ware/synse-snmp-plugin/blob/master/config.yml
+## Configure resource requests and limits.
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+resources:
+  requests: {}
+  limits: {}
+
+## Node labels for pod assignment
+## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+nodeSelector: {}
+
+## Tolerations for pod assignment
+## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+tolerations: []
+
+## Affinity for pod assignment
+## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+affinity: {}
+
+## Plugin configuration
+## The configuration below specifies a basic default configuration for the plugin.
+## Deployments which require anything different than this basic configuration will
+## need to specify their own config wholesale - single fields may not be overridden
+## from this config block.
+##
+## If the plugin will use dynamic configuration, this should be set here, under the
+## `dynamicRegistration` config option. See the SDK documentation and plugin README
+## for more details.
 config:
-  version: 1.0
+  version: 3
   debug: true
   network:
     type: tcp
-    address: "0.0.0.0:5003"
+    address: ":5003"
   settings:
     mode: serial
     read:
       interval: 3s
       buffer: 1024
     write:
-      interval: 1s
-      buffer: 1024
+      # The SNMP plugin does not currently support writes
+      enabled: false
 
 ## Device configuration
-## Each site should define its own device configuration since this may
-## change from site to site depending on what is actually deployed. If
-## using dynamic registration, this field does not need to be set -
-## instead, the `config` field should be overridden on a per-site basis.
+## Each instance should define its own device configuration. This may be different
+## per deployment depending on what physical assets are available,. If using dynamic
+## registration, this field does not need to be set. Instead, the `config` option
+## should be overridden with the dynamic registration configuration.
 devices: {}

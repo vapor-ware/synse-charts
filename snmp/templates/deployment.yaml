@@ -3,53 +3,134 @@ kind: Deployment
 metadata:
   name: {{ template "fullname" . }}
   labels:
-{{ include "labels" . | indent 4 }}
+    synse-component: plugin
+    app: {{ template "name" . }}
+    chart: {{ template "chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    {{- if .Values.deployment.labels }}
+    {{- toYaml .Values.deployment.labels | trim | nindent 4 }}
+    {{- end }}
+  {{- if .Values.deployment.annotations }}
   annotations:
-{{ include "annotations" . | indent 4 }}
+    {{- toYaml .Values.deployment.annotations | trim | nindent 4 }}
+  {{- end }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.deployment.replicas }}
   selector:
     matchLabels:
-{{ include "selector" . | indent 6 }}
+      synse-component: plugin
+      app: {{ template "name" . }}
+      release: {{ .Release.Name }}
   template:
     metadata:
       name: {{ template "fullname" . }}
       labels:
-{{ include "labels" . | indent 8 }}
+        synse-component: plugin
+        app: {{ template "name" . }}
+        chart: {{ template "chart" . }}
+        release: {{ .Release.Name }}
+        {{- if .Values.pod.labels }}
+        {{- toYaml .Values.pod.labels | trim | nindent 8 }}
+        {{- end }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
-{{ include "annotations" . | indent 8 }}
+        {{- if .Values.pod.annotations }}
+        {{- toYaml .Values.pod.annotations | trim | nindent 8 }}
+        {{- end }}
     spec:
-      # Setting the hostname because the UPSs only take communications from specific hostnames.
-      # This works from the container which has a different host name than the VEC.
-      hostname: {{ template "name" . }}
+      {{- if .Values.pod.hostname }}
+      # Set the hostname for the pod. This may be required for SNMP devices which only allow
+      # communication from specific hostnames.
+      hostname: {{ .Values.pod.hostname }}
+      {{- end }}
       terminationGracePeriodSeconds: 3
+      {{- if (or .Values.config .Values.devices) }}
       volumes:
-      - name: plugin-config
+        {{- if .Values.config }}
+        - name: config
+          configMap:
+            name: {{ template "fullname" . }}-config
+        {{- end }}
+        {{- if .Values.devices }}
+        - name: devices
         configMap:
-          name: {{ template "name" . }}-plugin
-      - name: device-config
-        configMap:
-          name: {{ template "name" . }}-devices
+          name: {{ template "fullname" . }}-devices
+        {{- end }}
+      {{- end }}
       containers:
       - name: {{ .Chart.Name }}
         image: {{ .Values.image.registry }}{{ .Values.image.repository }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        ## QUESTION (etd): does SNMP need to run as a privileged container??
+        {{- if .Values.pod.securityContext }}
         securityContext:
-          privileged: true
+          {{- toYaml .Values.pod.securityContext | trim | nindent 10 }}
+        {{- end }}
         ports:
         - name: http
           containerPort: {{ .Values.service.port }}
+        {{- if .Values.metrics.enabled }}
+        - name: metrics
+          containerPort: 2112
+        {{- end }}
         {{- if .Values.args }}
         args: {{ .Values.args }}
         {{- end }}
+        env:
+          - name: PLUGIN_METRICS_ENABLED
+            value: {{ .Values.metrics.enabled | quote }}
+          {{- if .Values.env }}
+          {{- toYaml .Values.env | trim | nindent 10 }}
+          {{- end }}
+        {{- if (or .Values.config .Values.devices) }}
         volumeMounts:
-        - name: plugin-config
-          mountPath: /etc/synse/plugin/config
-        - name: device-config
-          mountPath: /etc/synse/plugin/config/devices
-        {{ if .Values.resources -}}
-        resources:
-{{ toYaml .Values.resources | indent 10 }}
+        {{- if .Values.config }}
+        - name: config
+          mountPath: /etc/synse/plugin/config/config.yml
+          subPath: config.yml
         {{- end }}
+        {{- if .Values.devices }}
+        - name: devices
+          mountPath: /etc/synse/plugin/config/device
+        {{- end }}
+        {{- end }}
+        {{- if .Values.livenessProbe.enabled }}
+        {{- with .Values.livenessProbe }}
+        livenessProbe:
+          initialDelaySeconds: {{ .initialDelaySeconds }}
+          timeoutSeconds: {{ .timeoutSeconds }}
+          periodSeconds: {{ .periodSeconds }}
+          exec:
+            command:
+              - /bin/exists
+              - /etc/synse/plugin/healthy
+        {{- end }}
+        {{- end }}
+        {{- if .Values.readinessProbe.enabled }}
+        {{- with .Values.readinessProbe }}
+        readinessProbe:
+          initialDelaySeconds: {{ .initialDelaySeconds }}
+          timeoutSeconds: {{ .timeoutSeconds }}
+          periodSeconds: {{ .periodSeconds }}
+          exec:
+            command:
+              - /bin/exists
+              - /etc/synse/plugin/healthy
+        {{- end }}
+        {{- end }}
+        {{- if .Values.resources }}
+        resources:
+          {{- toYaml .Values.resources | trim | nindent 10 }}
+        {{- end -}}
+      {{- if .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | trim | nindent 8 }}
+      {{- end }}
+      {{- if .Values.tolerations }}
+      tolerations:
+        {{- toYaml .Values.tolerations | trim | nindent 8 }}
+      {{- end }}
+      {{- if .Values.affinity }}
+      affinity:
+        {{- toYaml .Values.affinity | trim | nindent 8 }}
+      {{- end }}
