@@ -29,11 +29,11 @@ pipeline {
         // Create our staging repos
         sh 'mkdir -p .chart-repo .chart-staging'
         // Mount .chart-repo to Google Cloud Storage
-        sh 'gcsfuse synse-charts .chart-repo'
+        sh 'gcsfuse charts.vapor.io .chart-repo'
         // Build packages in .chart-staging, move new ones to .chart-repo (gcs), create new index
         sh 'helm package --dependency-update --destination .chart-staging */'
         sh 'cp -vn .chart-staging/*.tgz .chart-repo/'
-        sh 'helm repo index --url https://synse-charts.storage.googleapis.com .chart-repo'
+        sh 'helm repo index --url https://charts.vapor.io .chart-repo'
       }
       post {
         always {
