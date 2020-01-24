@@ -95,6 +95,9 @@ config:
     mode: serial
     read:
       interval: 5s
+    cache:
+      enabled: true
+      ttl: 5m
 
 ## Device configuration
 ## Each instance should define its own device configuration. This may be different
