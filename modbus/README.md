@@ -48,7 +48,7 @@ The following table lists the configurable parameters of the Synse Modbus Plugin
 | `metrics.enabled` | Enable/disable application metrics export (via Prometheus) at `:2112/metrics`. | `false` |
 | `image.registry` | The image registry to use. | `""` |
 | `image.repository` | The name of the image to use. | `vaporio/modbus-ip-plugin` |
-| `image.tag` | The tag of the image to use. | `3.0.0-alpha.1` |
+| `image.tag` | The tag of the image to use. | `2.0.0` |
 | `image.pullPolicy` | The image pull policy. | `Always` |
 | `deployment.annotations` | Additional annotations for the Deployment. | `{}` |
 | `deployment.labels` | Additional labels for the Deployment. | `{}` |
