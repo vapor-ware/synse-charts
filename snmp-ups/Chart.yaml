@@ -1,0 +1,16 @@
+apiVersion: v1
+name: snmp-ups
+version: 0.1.0
+appVersion: 0.1.0
+description: SNMP plugin the RFC1628 UPS MIB
+home: https://github.com/vapor-ware/synse-snmp-ups-plugin
+icon: https://charts.vapor.io/.images/synse-snmp.jpg
+sources:
+  - https://github.com/vapor-ware/synse-snmp-ups-plugin.git
+maintainers:
+- name: Matthew Hink
+  email: mhink@vapor.io
+- name: Marco Ceppi
+  email: marco@vapor.io
+- name: Erick Daniszewski
+  email: erick@vapor.io
