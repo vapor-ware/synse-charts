@@ -1,0 +1,123 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+    synse-component: plugin
+    app: {{ template "name" . }}
+    chart: {{ template "chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    {{- if .Values.deployment.labels }}
+    {{- toYaml .Values.deployment.labels | trim | nindent 4 }}
+    {{- end }}
+  {{- if .Values.deployment.annotations }}
+  annotations:
+    {{- toYaml .Values.deployment.annotations | trim | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.deployment.replicas }}
+  selector:
+    matchLabels:
+      synse-component: plugin
+      app: {{ template "name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      name: {{ template "fullname" . }}
+      labels:
+        synse-component: plugin
+        app: {{ template "name" . }}
+        chart: {{ template "chart" . }}
+        release: {{ .Release.Name }}
+        {{- if .Values.pod.labels }}
+        {{- toYaml .Values.pod.labels | trim | nindent 8 }}
+        {{- end }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- if .Values.pod.annotations }}
+        {{- toYaml .Values.pod.annotations | trim | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- if .Values.pod.hostname }}
+      # Set the hostname for the pod. This may be required for SNMP devices which only allow
+      # communication from specific hostnames.
+      hostname: {{ .Values.pod.hostname }}
+      {{- end }}
+      terminationGracePeriodSeconds: 3
+      {{- if .Values.config }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ template "fullname" .  }}-config
+      {{- end }}
+      containers:
+      - name: {{ .Chart.Name }}
+        image: {{ .Values.image.registry }}{{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        {{- if .Values.pod.securityContext }}
+        securityContext:
+          {{- toYaml .Values.pod.securityContext | trim | nindent 10 }}
+        {{- end }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.service.port }}
+        {{- if .Values.metrics.enabled }}
+        - name: metrics
+          containerPort: 2112
+        {{- end }}
+        {{- if .Values.args }}
+        args: {{ .Values.args }}
+        {{- end }}
+        env:
+          - name: PLUGIN_METRICS_ENABLED
+            value: {{ .Values.metrics.enabled | quote }}
+          {{- if .Values.env }}
+          {{- toYaml .Values.env | trim | nindent 10 }}
+          {{- end }}
+        {{- if .Values.config }}
+        volumeMounts:
+          - name: config
+            mountPath: /etc/synse/plugin/config/config.yml
+            subPath: config.yml
+        {{- end }}
+        {{- if .Values.livenessProbe.enabled }}
+        {{- with .Values.livenessProbe }}
+        livenessProbe:
+          initialDelaySeconds: {{ .initialDelaySeconds }}
+          timeoutSeconds: {{ .timeoutSeconds }}
+          periodSeconds: {{ .periodSeconds }}
+          exec:
+            command:
+              - /bin/exists
+              - /etc/synse/plugin/healthy
+        {{- end }}
+        {{- end }}
+        {{- if .Values.readinessProbe.enabled }}
+        {{- with .Values.readinessProbe }}
+        readinessProbe:
+          initialDelaySeconds: {{ .initialDelaySeconds }}
+          timeoutSeconds: {{ .timeoutSeconds }}
+          periodSeconds: {{ .periodSeconds }}
+          exec:
+            command:
+              - /bin/exists
+              - /etc/synse/plugin/healthy
+        {{- end }}
+        {{- end }}
+        {{- if .Values.resources }}
+        resources:
+          {{- toYaml .Values.resources | trim | nindent 10 }}
+        {{- end -}}
+      {{- if .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | trim | nindent 8 }}
+      {{- end }}
+      {{- if .Values.tolerations }}
+      tolerations:
+        {{- toYaml .Values.tolerations | trim | nindent 8 }}
+      {{- end }}
+      {{- if .Values.affinity }}
+      affinity:
+        {{- toYaml .Values.affinity | trim | nindent 8 }}
+      {{- end }}
