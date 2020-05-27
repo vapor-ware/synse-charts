@@ -45,6 +45,7 @@ The following table lists the configurable parameters of the Synse Juniper JTI P
 | `nameOverride` | Partially override the fullname template (will maintain the release name). | `""` |
 | `fullnameOverride` | Fully override the fullname template. | `""` |
 | `metrics.enabled` | Enable/disable application metrics export (via Prometheus) at `:2112/metrics`. | `false` |
+| `udpServer.port` | The port to expose for the UDP server receiving streamed JTI data. | `""` |
 | `image.registry` | The image registry to use. | `""` |
 | `image.repository` | The name of the image to use. | `vaporio/juniper-jti-plugin` |
 | `image.tag` | The tag of the image to use. | `0.1.0` |

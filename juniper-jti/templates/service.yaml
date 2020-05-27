@@ -21,6 +21,10 @@ spec:
     - port: {{ .Values.service.port }}
       targetPort: http
       name: http
+    - port: {{ .Values.udpServer.port }}
+      targetPort: udpServer
+      name: udpServer
+      protocol: UDP
     {{- if .Values.metrics.enabled }}
     - port: 2112
       targetPort: metrics
