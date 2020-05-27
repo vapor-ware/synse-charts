@@ -57,6 +57,9 @@ spec:
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
+            - name: udpServer
+              containerPort: {{ .Values.udpServer.port }}
+              protocol: UDP
             {{- if .Values.metrics.enabled }}
             - name: metrics
               containerPort: 2112
