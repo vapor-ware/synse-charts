@@ -1,0 +1,15 @@
+{{- if .Values.config }}
+# Plugin configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "fullname" . }}-config
+  labels:
+    synse-component: plugin
+    app: {{ template "name" . }}
+    chart: {{ template "chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  config.yml: {{ toYaml .Values.config | quote }}
+{{- end }}
