@@ -20,6 +20,26 @@ image:
 metrics:
   enabled: false
 
+## Prometheus monitoring
+monitoring:
+  serviceMonitor:
+    enabled: false
+    name: juniper_jti_monitor
+    port: metrics
+    path: "/metrics"
+    timeout: 4s
+    interval: 5s
+
+    # Deploy the ServiceMonitor to a namespace other than the target for the Release. Required in some setups.
+    namespace: ""
+    # Which namespace the prometheus tooling should interrogate to find services and pods.
+    selectorNamespace: ""
+    # Labels used to select the services/pods to monitor.
+    selectorLabels: {}
+    # Labels applied to the ServiceMonitor.
+    labels: {}
+      #vapor.io/monitor: application
+
 ## Define the port which the plugin's UDP server is configured to listen on
 ## (via the `config` block). This is required in order to expose the port for
 ## incoming streamed JTI data.
