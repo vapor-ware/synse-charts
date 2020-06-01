@@ -57,8 +57,8 @@ spec:
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
-            - name: udpServer
-              containerPort: {{ .Values.udpServer.port }}
+            - name: jti
+              containerPort: {{ .Values.service.jti.port }}
               protocol: UDP
             {{- if .Values.metrics.enabled }}
             - name: metrics

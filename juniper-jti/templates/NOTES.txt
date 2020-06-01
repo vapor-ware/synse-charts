@@ -1,10 +1,10 @@
 {{ .Chart.Name }}
   chart: {{ .Chart.Version }}
   app:   {{ .Chart.AppVersion }}
-{{- if empty .Values.udpServer.port }}
+{{- if empty .Values.service.jti.port }}
 
 WARNING: Error detected with Juniper JTI configuration. The value for
-  'udpServer.port' was not found, but is required. It should take the
+  'service.jti.port' was not found, but is required. It should take the
   same port value of the server address specified in the plugin's
   'dynamicRegistration' block.
 {{- end }}
