@@ -20,6 +20,31 @@ image:
 metrics:
   enabled: false
 
+## Service configurations for the emulator plugin.
+## ref: http://kubernetes.io/docs/user-guide/services/
+##
+## The port here should match the network address in the
+## plugin configuration, below.
+service:
+  type: ClusterIP
+  port: 5010
+  clusterIP: ""
+  annotations: {}
+  labels: {}
+
+  # Configurations for the plugin's UDP server, listening for incoming
+  # streamed JTI data. The value of port here should be the same configured
+  # in the plugin config's "dynamicRegistration" block.
+  # FIXME (etd): This is not an ideal way of defining this config, as it is
+  #   a duplicate config option from what is listed in the `config` block,
+  #   but there doesn't seem to be a clean, easy way of deduplicating the
+  #   config, so for the initial version of the chart, this is okay. If this
+  #   is missing in the configuration, a message will be printed out via
+  #   NOTES.txt.
+  jti:
+    port: ""
+    #nodePort: 30000
+
 ## Prometheus monitoring
 monitoring:
   serviceMonitor:
@@ -39,19 +64,6 @@ monitoring:
     # Labels applied to the ServiceMonitor.
     labels: {}
       #vapor.io/monitor: application
-
-## Define the port which the plugin's UDP server is configured to listen on
-## (via the `config` block). This is required in order to expose the port for
-## incoming streamed JTI data.
-##
-## FIXME (etd): This is not an ideal way of defining this config, as it is
-##   a duplicate config option from what is listed in the `config` block,
-##   but there doesn't seem to be a clean, easy way of deduplicating the
-##   config, so for the initial version of the chart, this is okay. If this
-##   is missing in the configuration, a message will be printed out via
-##   NOTES.txt.
-udpServer:
-  port: ""
 
 ## Deployment configuration options.
 deployment:
@@ -73,16 +85,6 @@ securityContext: {}
   # readOnlyRootFilesystem: true
   # runAsNonRoot: true
   # runAsUser: 1000
-
-## Service configurations for the emulator plugin.
-## ref: http://kubernetes.io/docs/user-guide/services/
-##
-## The port here should match the network address in the
-## plugin configuration, below.
-service:
-  port: 5010
-  annotations: {}
-  labels: {}
 
 ## Readiness and liveness probe configuration options
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/

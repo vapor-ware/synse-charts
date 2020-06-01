@@ -38,6 +38,7 @@ The command removes all the Kubernetes components associated with the chart and 
 ## Configuration
 
 The following table lists the configurable parameters of the Synse Juniper JTI Plugin chart and their default values.
+A value of `-` indicates no default is defined.
 
 | Parameter | Description | Default |
 | :-------- | :---------- | :------ |
@@ -45,7 +46,6 @@ The following table lists the configurable parameters of the Synse Juniper JTI P
 | `nameOverride` | Partially override the fullname template (will maintain the release name). | `""` |
 | `fullnameOverride` | Fully override the fullname template. | `""` |
 | `metrics.enabled` | Enable/disable application metrics export (via Prometheus) at `:2112/metrics`. | `false` |
-| `udpServer.port` | The port to expose for the UDP server receiving streamed JTI data. | `""` |
 | `image.registry` | The image registry to use. | `""` |
 | `image.repository` | The name of the image to use. | `vaporio/juniper-jti-plugin` |
 | `image.tag` | The tag of the image to use. | `0.1.0` |
@@ -59,7 +59,11 @@ The following table lists the configurable parameters of the Synse Juniper JTI P
 | `securityContext` | Security definitions for containers running in the Pod. | `{}` |
 | `service.annotations` | Additional annotations for the Service. | `{}` |
 | `service.labels` | Additional labels for the Service. | `{}` |
-| `service.port` | The Service port to expose. | `5010` |
+| `service.type` | The Service type, defining how it is exposed to the network. | `ClusterIP` |
+| `service.port` | The Service port to expose (http). | `5010` |
+| `service.clusterIP` | The cluster IP to assign when service type is ClusterIP. | `""` |
+| `service.jti.port` | The port to expose for the plugin's UDP server for receiving streamed Juniper telemetry. | `""` |
+| `service.jti.nodePort` | The node port to proxy requests from when service type is NodePort. | `-` |
 | `monitoring.serviceMonitor.enabled` | Enable/Disable the ServiceMonitor. | `false` |
 | `monitoring.serviceMonitor.name` | The name of the monitor job. It may contain ASCII letters and digits, as well as underscores. It must match the regex [a-zA-Z_:][a-zA-Z0-9_]. | `juniper_jti_monitor` |
 | `monitoring.serviceMonitor.namespace` | Deploy the ServiceMonitor to a namespace other than the target for the Release. Required in some setups. | `""` |

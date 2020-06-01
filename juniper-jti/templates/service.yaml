@@ -16,19 +16,27 @@ metadata:
     {{- toYaml .Values.service.annotations | trim | nindent 4 }}
   {{- end }}
 spec:
-  clusterIP: None
+  type: {{ .Values.service.type | default "ClusterIP" }}
+  {{- if (or (eq .Values.service.type "ClusterIP") (empty .Values.service.type)) }}
+  clusterIP: {{ .Values.service.clusterIP | default "None" }}
+  {{- end }}
   ports:
     - port: {{ .Values.service.port }}
       targetPort: http
       name: http
-    - port: {{ .Values.udpServer.port }}
-      targetPort: udpServer
-      name: udpServer
+      nodePort: null
+    - port: {{ .Values.service.jti.port }}
+      targetPort: jti
+      name: jti
       protocol: UDP
+      {{- if (and (eq .Values.service.type "NodePort") (not (empty .Values.service.jti.nodePort))) }}
+      nodePort: {{ .Values.service.jti.nodePort }}
+      {{- end }}
     {{- if .Values.metrics.enabled }}
     - port: 2112
       targetPort: metrics
       name: metrics
+      nodePort: null
     {{- end }}
   selector:
     synse-component: plugin
