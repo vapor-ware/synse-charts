@@ -25,7 +25,7 @@ metrics:
   ## can differentiate the metrics service from other defined services.
   labels: {}
 
-## Service configurations for the emulator plugin.
+## Service configurations for the plugin.
 ## ref: http://kubernetes.io/docs/user-guide/services/
 ##
 ## The port here should match the network address in the
@@ -42,7 +42,7 @@ service:
   # in the plugin config's "dynamicRegistration" block.
   # FIXME (etd): This is not an ideal way of defining this config, as it is
   #   a duplicate config option from what is listed in the `config` block,
-  #   but there doesn't seem to be a clean, easy way of deduplicating the
+  #   but there doesn't seem to be a clean, easy way of de-duplicating the
   #   config, so for the initial version of the chart, this is okay. If this
   #   is missing in the configuration, a message will be printed out via
   #   NOTES.txt.
