@@ -32,13 +32,30 @@ spec:
       {{- if (and (eq .Values.service.type "NodePort") (not (empty .Values.service.jti.nodePort))) }}
       nodePort: {{ .Values.service.jti.nodePort }}
       {{- end }}
-    {{- if .Values.metrics.enabled }}
-    - port: 2112
-      targetPort: metrics
-      name: metrics
-      nodePort: null
-    {{- end }}
   selector:
     synse-component: plugin
     app: {{ template "name" . }}
     release: {{ .Release.Name }}
+
+{{- if .Values.metrics.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "fullname" . }}-metrics
+  labels:
+    app: {{ template "name" . }}
+    chart: {{ template "chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  clusterIP: None
+  ports:
+    - port: 2112
+      targetPort: metrics
+      name: metrics
+  selector:
+    synse-component: plugin
+    app: {{ template "name" . }}
+    release: {{ .Release.Name }}
+{{- end }}
