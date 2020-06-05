@@ -48,6 +48,9 @@ metadata:
     chart: {{ template "chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+    {{- if .Values.metrics.labels }}
+    {{- toYaml .Values.metrics.labels | trim | nindent 4 }}
+    {{- end }}
 spec:
   clusterIP: None
   ports:
