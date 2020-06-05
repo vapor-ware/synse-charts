@@ -46,6 +46,7 @@ A value of `-` indicates no default is defined.
 | `nameOverride` | Partially override the fullname template (will maintain the release name). | `""` |
 | `fullnameOverride` | Fully override the fullname template. | `""` |
 | `metrics.enabled` | Enable/disable application metrics export (via Prometheus) at `:2112/metrics`. | `false` |
+| `metrics.labels` | Additional labels for the metrics Service. This is used by the service monitor to target the exposed metrics port. | `{}` |
 | `image.registry` | The image registry to use. | `""` |
 | `image.repository` | The name of the image to use. | `vaporio/juniper-jti-plugin` |
 | `image.tag` | The tag of the image to use. | `0.1.0` |

@@ -20,6 +20,11 @@ image:
 metrics:
   enabled: false
 
+  ## Labels applied to the metrics service definition. This should be
+  ## set when running with Prometheus monitoring so the service monitor
+  ## can differentiate the metrics service from other defined services.
+  labels: {}
+
 ## Service configurations for the emulator plugin.
 ## ref: http://kubernetes.io/docs/user-guide/services/
 ##
