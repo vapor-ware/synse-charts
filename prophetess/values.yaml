@@ -5,7 +5,7 @@
 pod:
   pullSecret: ""
   prophetess:
-    image: vaporio/prophetess:0.2.0
+    image: vaporio/prophetess:0.2.1
     pullPolicy: "Always"
     securityContext:
       privileged: false
