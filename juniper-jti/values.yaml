@@ -31,11 +31,12 @@ metrics:
 ## The port here should match the network address in the
 ## plugin configuration, below.
 service:
-  type: ClusterIP
-  port: 5010
-  clusterIP: ""
-  annotations: {}
-  labels: {}
+  # Configurations for the plugin's port connecting to Synse Server.
+  synse:
+    type: ClusterIP
+    port: 5010
+    annotations: {}
+    labels: {}
 
   # Configurations for the plugin's UDP server, listening for incoming
   # streamed JTI data. The value of port here should be the same configured
@@ -47,8 +48,11 @@ service:
   #   is missing in the configuration, a message will be printed out via
   #   NOTES.txt.
   jti:
+    type: ClusterIP
     port: ""
     #nodePort: 30000
+    annotations: {}
+    labels: {}
 
 ## Prometheus monitoring
 monitoring:
