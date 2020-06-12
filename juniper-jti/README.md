@@ -58,13 +58,17 @@ A value of `-` indicates no default is defined.
 | `pod.labels` | Additional labels for the Pod. | `{}` |
 | `pod.securityContext` | Pod security definitions. | `{}` |
 | `securityContext` | Security definitions for containers running in the Pod. | `{}` |
-| `service.annotations` | Additional annotations for the Service. | `{}` |
-| `service.labels` | Additional labels for the Service. | `{}` |
-| `service.type` | The Service type, defining how it is exposed to the network. | `ClusterIP` |
-| `service.port` | The Service port to expose (http). | `5010` |
-| `service.clusterIP` | The cluster IP to assign when service type is ClusterIP. | `""` |
+| `service.synse.annotations` | Additional annotations for the Service connecting to Synse. | `{}` |
+| `service.synse.labels` | Additional labels for the Service connecting to Synse. | `{}` |
+| `service.synse.type` | The Service type, defining how it is exposed to the network, for the Service connecting to Synse. | `ClusterIP` |
+| `service.synse.port` | The Service port to expose (http), for the Service connecting to Synse. | `5010` |
+| `service.synse.clusterIP` | The cluster IP to assign when service type is ClusterIP, for the Service connecting to Synse. | `""` |
+| `service.jti.annotations` | Additional annotations for the Service receiving JTI data. | `{}` |
+| `service.jti.labels` | Additional labels for the Service receiving JTI data. | `{}` |
+| `service.jti.type` | The Service type, defining how it is exposed to the network, for the Service receiving JTI data. | `ClusterIP` |
 | `service.jti.port` | The port to expose for the plugin's UDP server for receiving streamed Juniper telemetry. | `""` |
-| `service.jti.nodePort` | The node port to proxy requests from when service type is NodePort. | `-` |
+| `service.jti.clusterIP` | The cluster IP to assign when service type is ClusterIP, for the Service receiving JTI data. | `""` |
+| `service.jti.nodePort` | The node port to proxy requests from when service type is NodePort, for the Service receiving JTI data. | `-` |
 | `monitoring.serviceMonitor.enabled` | Enable/Disable the ServiceMonitor. | `false` |
 | `monitoring.serviceMonitor.name` | The name of the monitor job. It may contain ASCII letters and digits, as well as underscores. It must match the regex [a-zA-Z_:][a-zA-Z0-9_]. | `juniper_jti_monitor` |
 | `monitoring.serviceMonitor.namespace` | Deploy the ServiceMonitor to a namespace other than the target for the Release. Required in some setups. | `""` |

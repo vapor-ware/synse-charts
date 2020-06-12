@@ -1,35 +1,63 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "fullname" . }}
+  name: {{ template "fullname" . }}-synse
   labels:
     synse-component: plugin
     app: {{ template "name" . }}
     chart: {{ template "chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-    {{- if .Values.service.labels }}
-    {{- toYaml .Values.service.labels | trim | nindent 4 }}
+    {{- if .Values.service.synse.labels }}
+    {{- toYaml .Values.service.synse.labels | trim | nindent 4 }}
     {{- end }}
-  {{- if .Values.service.annotations }}
+  {{- if .Values.service.synse.annotations }}
   annotations:
-    {{- toYaml .Values.service.annotations | trim | nindent 4 }}
+    {{- toYaml .Values.service.synse.annotations | trim | nindent 4 }}
   {{- end }}
 spec:
-  type: {{ .Values.service.type | default "ClusterIP" }}
-  {{- if (or (eq .Values.service.type "ClusterIP") (empty .Values.service.type)) }}
-  clusterIP: {{ .Values.service.clusterIP | default "None" }}
+  type: {{ .Values.service.synse.type | default "ClusterIP" }}
+  {{- if (or (eq .Values.service.synse.type "ClusterIP") (empty .Values.service.synse.type)) }}
+  clusterIP: {{ .Values.service.synse.clusterIP | default "" }}
   {{- end }}
   ports:
-    - port: {{ .Values.service.port }}
+    - port: {{ .Values.service.synse.port }}
       targetPort: http
       name: http
-      nodePort: null
+  selector:
+    synse-component: plugin
+    app: {{ template "name" . }}
+    release: {{ .Release.Name }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "fullname" . }}-jti
+  labels:
+    synse-component: plugin
+    app: {{ template "name" . }}
+    chart: {{ template "chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    {{- if .Values.service.jti.labels }}
+    {{- toYaml .Values.service.jti.labels | trim | nindent 4 }}
+    {{- end }}
+  {{- if .Values.service.jti.annotations }}
+  annotations:
+    {{- toYaml .Values.service.jti.annotations | trim | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.service.jti.type | default "ClusterIP" }}
+  {{- if (or (eq .Values.service.jti.type "ClusterIP") (empty .Values.service.jti.type)) }}
+  clusterIP: {{ .Values.service.jti.clusterIP | default "" }}
+  {{- end }}
+  ports:
     - port: {{ .Values.service.jti.port }}
       targetPort: jti
       name: jti
       protocol: UDP
-      {{- if (and (eq .Values.service.type "NodePort") (not (empty .Values.service.jti.nodePort))) }}
+      {{- if (and (eq .Values.service.jti.type "NodePort") (not (empty .Values.service.jti.nodePort))) }}
       nodePort: {{ .Values.service.jti.nodePort }}
       {{- end }}
   selector:
