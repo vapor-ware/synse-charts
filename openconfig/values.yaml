@@ -1,0 +1,130 @@
+# Default values for the Synse openconfig plugin.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+
+## Partially override the fullname template (will maintain the release name).
+nameOverride: ""
+
+## Fully override the fullname template.
+fullnameOverride: ""
+
+## Image configuration options.
+image:
+  registry: "" # Add a registry if we need to use the non-default one
+  repository: vaporio/openconfig-plugin
+  tag: "0.1.0"
+  pullPolicy: Always
+
+## Enable/disable application metrics export via Prometheus.
+metrics:
+  enabled: false
+
+  ## Labels applied to the metrics service definition. This should be
+  ## set when running with Prometheus monitoring so the service monitor
+  ## can differentiate the metrics service from other defined services.
+  labels: {}
+
+## Prometheus monitoring
+monitoring:
+  serviceMonitor:
+    enabled: false
+    name: openconfig_monitor
+    port: metrics
+    path: "/metrics"
+    timeout: 4s
+    interval: 5s
+
+    # Deploy the ServiceMonitor to a namespace other than the target for the Release. Required in some setups.
+    namespace: ""
+    # Which namespace the prometheus tooling should interrogate to find services and pods.
+    selectorNamespace: ""
+    # Labels used to select the services/pods to monitor.
+    selectorLabels: {}
+    # Labels applied to the ServiceMonitor.
+    labels: {}
+      #vapor.io/monitor: application
+
+## Service configuration options.
+## ref: http://kubernetes.io/docs/user-guide/services/
+service:
+  annotations: {}
+  labels: {}
+  type: ClusterIP
+  port: 5011
+
+## Deployment configuration options.
+deployment:
+  annotations: {}
+  labels: {}
+  replicas: 1
+
+## Pod configuration options.
+pod:
+  annotations: {}
+  labels: {}
+  securityContext: {}
+    # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+## Readiness and liveness probe configuration options
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 15
+  timeoutSeconds: 2
+  periodSeconds: 5
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 5
+  timeoutSeconds: 2
+  periodSeconds: 5
+
+## Pass arguments to the plugin container. For additional startup
+## logging, you can pass the --debug flag. By default, no additional
+## arguments are passed to the container.
+#args: ["--debug"]
+args: []
+
+## Allow pass-through environment variable configuration.
+env: []
+
+## Configure resource requests and limits.
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+## Node labels for pod assignment
+## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+nodeSelector: {}
+
+## Tolerations for pod assignment
+## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+tolerations: []
+
+## Affinity for pod assignment
+## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+affinity: {}
+
+## Synse Plugin configuration.
+## The plugin requires a plugin configuration to be provided. This should be
+## specified on a per-release level. It is left empty here.
+#config:
+#  version: 3
+#  debug: true
+#  network:
+#    type: tcp
+#    address: ":5011"
+config: {}
