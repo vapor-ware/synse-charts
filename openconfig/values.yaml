@@ -45,6 +45,13 @@ monitoring:
     labels: {}
       #vapor.io/monitor: application
 
+# TLS certs which will be loaded as a Secret.
+tls:
+  enabled: false
+  key: ""
+  cert: ""
+  ca: ""
+
 ## Service configuration options.
 ## ref: http://kubernetes.io/docs/user-guide/services/
 service:

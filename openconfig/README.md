@@ -62,6 +62,10 @@ A value of `-` indicates no default is defined.
 | `service.labels` | Additional labels for the Service connecting to Synse. | `{}` |
 | `service.type` | The Service type, defining how it is exposed to the network, for the Service connecting to Synse. | `ClusterIP` |
 | `service.port` | The Service port to expose (http), for the Service connecting to Synse. | `5011` |
+| `tls.enabled` | Enable/disable the use of client TLS certs. | `false` |
+| `tls.key` | Private key to use for gRPC client TLS. | `""` |
+| `tls.cert` | Public cert to use for gRPC client TLS. | `""` |
+| `tls.ca` | PEM file to use a Certificate Authority for gRPC client TLS. | `""` |
 | `monitoring.serviceMonitor.enabled` | Enable/Disable the ServiceMonitor. | `false` |
 | `monitoring.serviceMonitor.name` | The name of the monitor job. It may contain ASCII letters and digits, as well as underscores. It must match the regex [a-zA-Z_:][a-zA-Z0-9_]. | `openconfig_monitor` |
 | `monitoring.serviceMonitor.namespace` | Deploy the ServiceMonitor to a namespace other than the target for the Release. Required in some setups. | `""` |
