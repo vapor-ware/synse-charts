@@ -47,6 +47,11 @@ spec:
         - name: config
           configMap:
             name: {{ template "fullname" . }}-config
+        {{- if .Values.tls.enabled }}
+        - name: tls-secrets
+          secret:
+            secretName: {{ template "fullname" . }}-tls-secrets
+        {{- end }}
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}
@@ -72,11 +77,17 @@ spec:
             {{- if .Values.env }}
             {{- toYaml .Values.env | trim | nindent 12}}
             {{- end }}
-          {{- if .Values.config }}
+          {{- if (or .Values.config .Values.tls.enabled) }}
           volumeMounts:
+            {{- if .Values.config }}
             - name: config
               mountPath: /etc/synse/plugin/config/config.yml
               subPath: config.yml
+            {{- end }}
+            {{- if .Values.tls.enabled }}
+            - name: tls-secrets
+              mountPath: /keys
+            {{- end }}
           {{- end }}
           {{- if .Values.livenessProbe.enabled }}
           {{- with .Values.livenessProbe }}
