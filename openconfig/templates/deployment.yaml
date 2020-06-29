@@ -1,0 +1,112 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "fullname" . }}
+  labels:
+    synse-component: plugin
+    app: {{ template "name" . }}
+    chart: {{ template "chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    {{- if .Values.deployment.labels }}
+    {{- toYaml .Values.deployment.labels | trim | nindent 4 }}
+    {{- end }}
+  {{- if .Values.deployment.annotations }}
+  annotations:
+    {{- toYaml .Values.deployment.annotations | trim | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.deployment.replicas }}
+  selector:
+    matchLabels:
+      synse-component: plugin
+      app: {{ template "name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      name: {{ template "fullname" . }}
+      labels:
+        synse-component: plugin
+        app: {{ template "name" . }}
+        chart: {{ template "chart" . }}
+        release: {{ .Release.Name }}
+        {{- if .Values.pod.labels }}
+        {{- toYaml .Values.pod.labels | trim | nindent 8 }}
+        {{- end }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- if .Values.pod.annotations }}
+        {{- toYaml .Values.pod.annotations | trim | nindent 8 }}
+        {{- end }}
+    spec:
+      terminationGracePeriodSeconds: 3
+      securityContext:
+        {{- toYaml .Values.pod.securityContext | trim | nindent 8 }}
+      {{- if .Values.config }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ template "fullname" . }}-config
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | trim | nindent 12 }}
+          image: "{{ .Values.image.registry }}{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+            {{- if .Values.metrics.enabled }}
+            - name: metrics
+              containerPort: 2112
+              protocol: TCP
+            {{- end }}
+          {{- if .Values.args }}
+          args: {{ .Values.args }}
+          {{- end }}
+          env:
+            - name: PLUGIN_METRICS_ENABLED
+              value: {{ .Values.metrics.enabled | quote }}
+            {{- if .Values.env }}
+            {{- toYaml .Values.env | trim | nindent 12}}
+            {{- end }}
+          {{- if .Values.config }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/synse/plugin/config/config.yml
+              subPath: config.yml
+          {{- end }}
+          {{- if .Values.livenessProbe.enabled }}
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            initialDelaySeconds: {{ .initialDelaySeconds }}
+            timeoutSeconds: {{ .timeoutSeconds }}
+            periodSeconds: {{ .periodSeconds }}
+            exec:
+              command:
+                - /bin/exists
+                - /etc/synse/plugin/healthy
+          {{- end }}
+          {{- end }}
+          {{- if .Values.readinessProbe.enabled }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            initialDelaySeconds: {{ .initialDelaySeconds }}
+            timeoutSeconds: {{ .timeoutSeconds }}
+            periodSeconds: {{ .periodSeconds }}
+            exec:
+              command:
+                - /bin/exists
+                - /etc/synse/plugin/healthy
+          {{- end }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | trim | nindent 12 }}
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | trim | nindent 8 }}
+      affinity:
+        {{- toYaml .Values.affinity | trim | nindent 8 }}
+      tolerations:
+        {{- toYaml .Values.tolerations | trim | nindent 8 }}
