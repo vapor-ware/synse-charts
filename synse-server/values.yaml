@@ -21,6 +21,26 @@ rbac:
 metrics:
   enabled: false
 
+## Prometheus monitoring
+monitoring:
+  serviceMonitor:
+    enabled: false
+    name: synse_server_monitor
+    port: http
+    path: "/metrics"
+    timeout: 4s
+    interval: 5s
+
+    # Deploy the ServiceMonitor to a namespace other than the target for the Release. Required in some setups.
+    namespace: ""
+    # Which namespace the prometheus tooling should interrogate to find services and pods.
+    selectorNamespace: ""
+    # Labels used to select the services/pods to monitor.
+    selectorLabels: {}
+    # Labels applied to the ServiceMonitor.
+    labels: {}
+      #vapor.io/monitor: application
+
 ## Image configuration options.
 image:
   registry: "" # Add a registry if we need to use the non-default one
