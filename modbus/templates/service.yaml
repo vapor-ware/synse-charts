@@ -16,17 +16,39 @@ metadata:
     {{- toYaml .Values.service.annotations | trim | nindent 4 }}
   {{- end }}
 spec:
+  type: {{ .Values.service.type | default "ClusterIP" }}
   clusterIP: None
   ports:
   - port: {{ .Values.service.port }}
     targetPort: http
     name: http
-  {{- if .Values.metrics.enabled }}
-  - port: 2112
-    targetPort: metrics
-    name: metrics
-  {{- end }}
   selector:
     synse-component: plugin
     app: {{ template "name" . }}
     release: {{ .Release.Name }}
+
+{{- if .Values.metrics.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "fullname" . }}-metrics
+  labels:
+    app: {{ template "name" . }}
+    chart: {{ template "chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    {{- if .Values.metrics.labels }}
+    {{- toYaml .Values.metrics.labels | trim | nindent 4 }}
+    {{- end }}
+spec:
+  clusterIP: None
+  ports:
+    - port: 2112
+      targetPort: metrics
+      name: metrics
+  selector:
+    synse-component: plugin
+    app: {{ template "name" . }}
+    release: {{ .Release.Name }}
+{{- end }}
