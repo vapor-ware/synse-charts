@@ -20,6 +20,31 @@ image:
 metrics:
   enabled: false
 
+  ## Labels applied to the metrics service definition. This should be
+  ## set when running with Prometheus monitoring so the service monitor
+  ## can differentiate the metrics service from other defined services.
+  labels: {}
+
+## Prometheus monitoring
+monitoring:
+  serviceMonitor:
+    enabled: false
+    name: emulator_monitor
+    port: metrics
+    path: "/metrics"
+    timeout: 4s
+    interval: 5s
+
+    # Deploy the ServiceMonitor to a namespace other than the target for the Release. Required in some setups.
+    namespace: ""
+    # Which namespace the prometheus tooling should interrogate to find services and pods.
+    selectorNamespace: ""
+    # Labels used to select the services/pods to monitor.
+    selectorLabels: {}
+    # Labels applied to the ServiceMonitor.
+    labels: {}
+      #vapor.io/monitor: application
+
 ## Deployment configuration options.
 deployment:
   annotations: {}
