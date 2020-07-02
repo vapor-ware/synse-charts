@@ -58,6 +58,16 @@ The following table lists the configurable parameters of the Synse Emulator Plug
 | `service.labels` | Additional labels for the Service. | `{}` |
 | `service.annotations` | Additional annotations for the Service. | `{}` |
 | `service.port` | The Service port to expose. | `5001` |
+| `monitoring.serviceMonitor.enabled` | Enable/Disable the ServiceMonitor. | `false` |
+| `monitoring.serviceMonitor.name` | The name of the monitor job. It may contain ASCII letters and digits, as well as underscores. It must match the regex [a-zA-Z_:][a-zA-Z0-9_]. | `emulator_monitor` |
+| `monitoring.serviceMonitor.namespace` | Deploy the ServiceMonitor to a namespace other than the target for the Release. Required in some setups. | `""` |
+| `monitoring.serviceMonitor.selectorNamespace` | Declares which namespace the prometheus tooling should interrogate to find the services and pods. | `"{{ .Release.Namespace }}"` |
+| `monitoring.serviceMonitor.selectorLabels` | Labels used to select the service/pods to monitor. | `{}` |
+| `monitoring.serviceMonitor.path` | The url segment to append to the discovered service endpoint. (eg: /metrics) | `"/metrics"` |
+| `monitoring.serviceMonitor.port` | The network port to attempt to connect to. Named ports are preferred, but numeric port numbers will work. | `"metrics"` |
+| `monitoring.serviceMonitor.timeout` | Timeout, in seconds, to terminate a scrape and classify as failed. | `"4s"` |
+| `monitoring.serviceMonitor.interval` | How often to scrape the metric data. | `"5s"` |
+| `monitoring.serviceMonitor.labels` | Labels to apply to the ServiceMonitor. | `{}` |
 | `livenessProbe.enabled` | Enable/disable the liveness probe check. | `true` |
 | `livenessProbe.initialDelaySeconds` | The delay before the probe starts, in seconds. | `30` |
 | `livenessProbe.timeoutSeconds` | The timeout before the probe should fail, in seconds. | `5` |
