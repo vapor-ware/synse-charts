@@ -1,12 +1,12 @@
 apiVersion: v1
-name: synse-loadgen
-version: 1.0.1
-appVersion: 1.0.1
+appVersion: 1.0.2-rc.2
 description: Generate request loads against the Synse Server API
 home: https://github.com/vapor-ware/synse-loadgen
 icon: https://charts.vapor.io/.images/synse-server-chart.jpg
+maintainers:
+- email: erick@vapor.io
+  name: Erick Daniszewski
+name: synse-loadgen
 sources:
 - https://github.com/vapor-ware/synse-loadgen
-maintainers:
-- name: Erick Daniszewski
-  email: erick@vapor.io
+version: 1.0.2-pre.1
