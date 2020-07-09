@@ -49,7 +49,7 @@ A value of `-` indicates no default is defined.
 | `metrics.labels` | Additional labels for the metrics Service. This is used by the service monitor to target the exposed metrics port. | `{}` |
 | `image.registry` | The image registry to use. | `""` |
 | `image.repository` | The name of the image to use. | `vaporio/openconfig-plugin` |
-| `image.tag` | The tag of the image to use. | `0.1.0` |
+| `image.tag` | The tag of the image to use. | `0.1.1` |
 | `image.pullPolicy` | The image pull policy. | `Always` |
 | `deployment.annotations` | Additional annotations for the Deployment. | `{}` |
 | `deployment.labels` | Additional labels for the Deployment. | `{}` |
