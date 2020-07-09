@@ -12,7 +12,7 @@ fullnameOverride: ""
 image:
   registry: "" # Add a registry if we need to use the non-default one
   repository: vaporio/synse-loadgen
-  tag: "1.0.1"
+  tag: "1.0.2-rc.2"
   pullPolicy: Always
 
 ## Deployment configuration options.
