@@ -48,7 +48,7 @@ The following table lists the configurable parameters of the Synse LoadGen chart
 | `fullnameOverride` | Fully override the fullname template. | `""` |
 | `image.registry` | The image registry to use. | `""` |
 | `image.repository` | The name of the image to use. | `vaporio/synse-loadgen` |
-| `image.tag` | The tag of the image to use. | `1.0.1` |
+| `image.tag` | The tag of the image to use. | `1.0.2` |
 | `image.pullPolicy` | The image pull policy. | `Always` |
 | `deployment.labels` | Additional labels for the Deployment. | `{}` |
 | `deployment.annotations` | Additional annotations for the Deployment. | `{}` |
