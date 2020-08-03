@@ -34,6 +34,7 @@ pipeline {
         sh 'helm package --dependency-update --destination .chart-staging */'
         sh 'cp -vn .chart-staging/*.tgz .chart-repo/'
         sh 'helm repo index --url https://charts.vapor.io .chart-repo'
+        sh 'gsutil setmeta -h "Cache-Control:no-cache,max-age=0"  -h "Content-Type:text/yaml" -h "Content-Encoding:UTF-8" gs://charts.vapor.io/*.yaml'
       }
       post {
         always {
