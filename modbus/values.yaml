@@ -13,7 +13,7 @@ fullnameOverride: ""
 image:
   registry: "" # Add a registry if we need to use the non-default one
   repository: vaporio/modbus-ip-plugin
-  tag: "2.0.6"
+  tag: "2.0.7"
   pullPolicy: Always
 
 ## Enable/disable application metrics export via Prometheus.
