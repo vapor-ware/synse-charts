@@ -13,7 +13,7 @@ fullnameOverride: ""
 image:
   registry: "" # Add a registry if we need to use the non-default one
   repository: vaporio/emulator-plugin
-  tag: "3.0.2"
+  tag: "3.0.3"
   pullPolicy: Always
 
 ## Enable/disable application metrics export via Prometheus.
