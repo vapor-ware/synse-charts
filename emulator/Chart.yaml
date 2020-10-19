@@ -1,16 +1,16 @@
 apiVersion: v1
-name: emulator
-version: 3.1.0
-appVersion: 3.0.2
+appVersion: 3.0.3
 description: A Synse plugin providing emulated devices and reading data
 home: https://github.com/vapor-ware/synse-emulator-plugin
 icon: https://charts.vapor.io/.images/synse-emulator.jpg
-sources:
-  - https://github.com/vapor-ware/synse-emulator-plugin.git
 maintainers:
-  - name: Erick Daniszewski
-    email: erick@vapor.io
-  - name: Marco Ceppi
-    email: marco@vapor.io
-  - name: Charles Butler
-    email: chuck@vapor.io
+- email: erick@vapor.io
+  name: Erick Daniszewski
+- email: marco@vapor.io
+  name: Marco Ceppi
+- email: chuck@vapor.io
+  name: Charles Butler
+name: emulator
+sources:
+- https://github.com/vapor-ware/synse-emulator-plugin.git
+version: 3.1.1
