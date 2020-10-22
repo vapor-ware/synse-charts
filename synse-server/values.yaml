@@ -25,7 +25,7 @@ metrics:
 monitoring:
   serviceMonitor:
     enabled: false
-    name: synse_server_monitor
+    name: synse-server-monitor
     port: http
     path: "/metrics"
     timeout: 4s
