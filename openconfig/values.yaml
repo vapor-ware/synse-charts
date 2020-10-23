@@ -29,7 +29,7 @@ metrics:
 monitoring:
   serviceMonitor:
     enabled: false
-    name: openconfig_monitor
+    name: openconfig-monitor
     port: metrics
     path: "/metrics"
     timeout: 4s
