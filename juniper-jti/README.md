@@ -70,7 +70,7 @@ A value of `-` indicates no default is defined.
 | `service.jti.clusterIP` | The cluster IP to assign when service type is ClusterIP, for the Service receiving JTI data. | `""` |
 | `service.jti.nodePort` | The node port to proxy requests from when service type is NodePort, for the Service receiving JTI data. | `-` |
 | `monitoring.serviceMonitor.enabled` | Enable/Disable the ServiceMonitor. | `false` |
-| `monitoring.serviceMonitor.name` | The name of the monitor job. It may contain ASCII letters and digits, as well as underscores. It must match the regex [a-zA-Z_:][a-zA-Z0-9_]. | `juniper_jti_monitor` |
+| `monitoring.serviceMonitor.name` | The name of the monitor job. It may contain ASCII letters and digits, as well as underscores. It must match the regex [a-zA-Z_:][a-zA-Z0-9_]. | `juniper-jti-monitor` |
 | `monitoring.serviceMonitor.namespace` | Deploy the ServiceMonitor to a namespace other than the target for the Release. Required in some setups. | `""` |
 | `monitoring.serviceMonitor.selectorNamespace` | Declares which namespace the prometheus tooling should interrogate to find the services and pods. | `"{{ .Release.Namespace }}"` |
 | `monitoring.serviceMonitor.selectorLabels` | Labels used to select the service/pods to monitor. | `{}` |

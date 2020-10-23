@@ -58,7 +58,7 @@ service:
 monitoring:
   serviceMonitor:
     enabled: false
-    name: juniper_jti_monitor
+    name: juniper-jti-monitor
     port: metrics
     path: "/metrics"
     timeout: 4s
