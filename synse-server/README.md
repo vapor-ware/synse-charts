@@ -65,7 +65,7 @@ The following table lists the configurable parameters of the Synse Server chart 
 | `ingress.hostname` | The Ingress hostname. | `""` |
 | `ingress.tls` | Ingress TLS configuration (YAML). | `[]` |
 | `monitoring.serviceMonitor.enabled` | Enable/Disable the ServiceMonitor. | `false` |
-| `monitoring.serviceMonitor.name` | The name of the monitor job. It may contain ASCII letters and digits, as well as underscores. It must match the regex [a-zA-Z_:][a-zA-Z0-9_]. | `synse_server_monitor` |
+| `monitoring.serviceMonitor.name` | The name of the monitor job. It may contain ASCII letters and digits, as well as underscores. It must match the regex [a-zA-Z_:][a-zA-Z0-9_]. | `synse-server-monitor` |
 | `monitoring.serviceMonitor.namespace` | Deploy the ServiceMonitor to a namespace other than the target for the Release. Required in some setups. | `""` |
 | `monitoring.serviceMonitor.selectorNamespace` | Declares which namespace the prometheus tooling should interrogate to find the services and pods. | `"{{ .Release.Namespace }}"` |
 | `monitoring.serviceMonitor.selectorLabels` | Labels used to select the service/pods to monitor. | `{}` |
