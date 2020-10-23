@@ -29,7 +29,7 @@ metrics:
 monitoring:
   serviceMonitor:
     enabled: false
-    name: emulator_monitor
+    name: emulator-monitor
     port: metrics
     path: "/metrics"
     timeout: 4s
