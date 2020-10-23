@@ -28,7 +28,7 @@ metrics:
 monitoring:
   serviceMonitor:
     enabled: false
-    name: snmp_ups_monitor
+    name: snmp-ups-monitor
     port: metrics
     path: "/metrics"
     timeout: 4s

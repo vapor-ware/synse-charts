@@ -2,7 +2,7 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ .Values.monitoring.serviceMonitor.name | default "snmp_ups_monitor" }}
+  name: {{ .Values.monitoring.serviceMonitor.name | default "snmp-ups-monitor" }}
   {{- if .Values.monitoring.serviceMonitor.namespace }}
   namespace: {{ .Values.monitoring.serviceMonitor.namespace }}
   {{- end }}
@@ -22,7 +22,7 @@ spec:
     {{- end }}
     scrapeTimeout: {{ .Values.monitoring.serviceMonitor.timeout | default "30s" }}
     targetPort: {{ .Values.monitoring.serviceMonitor.port }}
-  jobLabel: {{ .Values.monitoring.serviceMonitor.name | default "snmp_ups_monitor" }}
+  jobLabel: {{ .Values.monitoring.serviceMonitor.name | default "snmp-ups-monitor" }}
   namespaceSelector:
     matchNames:
     - {{ .Values.monitoring.serviceMonitor.selectorNamespace | default .Release.Namespace }}
