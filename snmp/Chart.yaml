@@ -1,7 +1,7 @@
 apiVersion: v1
 name: snmp
-version: 2.1.1
-appVersion: 2.0.0
+version: 2.1.2
+appVersion: 2.0.1
 description: SNMP plugin for Synse
 home: https://github.com/vapor-ware/synse-snmp-plugin
 icon: https://charts.vapor.io/.images/synse-snmp.jpg
