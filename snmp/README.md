@@ -48,7 +48,7 @@ The following table lists the configurable parameters of the Synse SNMP Plugin c
 | `metrics.enabled` | Enable/disable application metrics export (via Prometheus) at `:2112/metrics`. | `false` |
 | `image.registry` | The image registry to use. | `""` |
 | `image.repository` | The name of the image to use. | `vaporio/snmp-plugin` |
-| `image.tag` | The tag of the image to use. | `2.0.0` |
+| `image.tag` | The tag of the image to use. | `2.0.2` |
 | `image.pullPolicy` | The image pull policy. | `Always` |
 | `deployment.annotations` | Additional annotations for the Deployment. | `{}` |
 | `deployment.labels` | Additional labels for the Deployment. | `{}` |
