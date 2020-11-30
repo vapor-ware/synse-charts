@@ -32,3 +32,107 @@ data:
   config.yml: {{ toYaml .Values.devices | quote }}
 {{- end }}
 {{- end }}
+
+---
+
+# Device Templates
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "fullname" . }}-templates
+  labels:
+    synse-component: plugin
+    app: {{ template "name" . }}
+    chart: {{ template "chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  three-door: 
+    version: 3
+    devices:
+    - type: lock
+      context:
+        model: emul8-lock
+      instances:
+        # Rack 1
+        - info: Rack 1 Left Locker Facility
+          context:
+            location: '{{ "{{" }} env "RACK" {{ "}}" }}'
+            position: L1-36F
+          tags:
+            - vapor/location:'{{ "{{" }} env "RACK" {{ "}}" }}'
+            - lock/facility
+          data:
+            id: 1
+        - info: Rack 1 Center Locker 1-9A
+          context:
+            location: '{{ "{{" }} env "RACK" {{ "}}" }}'
+            position: L1-9A
+          tags:
+            - vapor/location:'{{ "{{" }} env "RACK" {{ "}}" }}'
+            - lock/tenant
+          data:
+            id: 2
+        - info: Rack 1 Right Locker 1-9B
+          context:
+            location: '{{ "{{" }} env "RACK" {{ "}}" }}'
+            position: L1-9B
+          tags:
+            - vapor/location:'{{ "{{" }} env "RACK" {{ "}}" }}'
+            - lock/networking
+          data:
+            id: 3
+        - info: Rack 1 Center Locker 10-18A
+          context:
+            location: '{{ "{{" }} env "RACK" {{ "}}" }}'
+            position: L10-18A
+          tags:
+            - vapor/location:'{{ "{{" }} env "RACK" {{ "}}" }}'
+            - lock/tenant
+          data:
+            id: 4
+        - info: Rack 1 Right Locker 10-18B
+          context:
+            location: '{{ "{{" }} env "RACK" {{ "}}" }}'
+            position: L10-18B
+          tags:
+            - vapor/location:R1
+            - lock/networking
+          data:
+            id: 5
+        - info: Rack 1 Center Locker 19-27A
+          context:
+            location: '{{ "{{" }} env "RACK" {{ "}}" }}'
+            position: L19-27A
+          tags:
+            - vapor/location:'{{ "{{" }} env "RACK" {{ "}}" }}'
+            - lock/tenant
+          data:
+            id: 6
+        - info: Rack 1 Right Locker 19-27B
+          context:
+            location: '{{ "{{" }} env "RACK" {{ "}}" }}'
+            position: L19-27B
+          tags:
+            - vapor/location:'{{ "{{" }} env "RACK" {{ "}}" }}'
+            - lock/networking
+          data:
+            id: 7
+        - info: Rack 1 Center Locker 28-36A
+          context:
+            location: '{{ "{{" }} env "RACK" {{ "}}" }}'
+            position: L28-36A
+          tags:
+            - vapor/location:'{{ "{{" }} env "RACK" {{ "}}" }}'
+            - lock/tenant
+          data:
+            id: 8
+        - info: Rack 1 Right Locker 28-36B
+          context:
+            location: '{{ "{{" }} env "RACK" {{ "}}" }}'
+            position: L28-36B
+          tags:
+            - vapor/location:'{{ "{{" }} env "RACK" {{ "}}" }}'
+            - lock/networking
+          data:
+            id: 9
