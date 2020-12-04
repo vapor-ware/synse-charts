@@ -21,7 +21,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
       labels:
         app: {{ template "prophetess.fullname" . }}
         release: "{{ .Release.Name }}"
@@ -39,5 +39,5 @@ spec:
               mountPath: /etc/prophetess
       volumes:
       - name: config
-        configMap:
-          name: {{ template "prophetess.fullname" . }}
+        secret:
+          secretName: {{ template "prophetess.fullname" . }}
