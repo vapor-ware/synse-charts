@@ -3,22 +3,19 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: {{ .Values.monitoring.serviceMonitor.name | default "openconfig-monitor" }}
-  {{- if .Values.monitoring.serviceMonitor.namespace }}
-  namespace: {{ .Values.monitoring.serviceMonitor.namespace }}
+  {{- with .Values.monitoring.serviceMonitor.namespace }}
+  namespace: {{ . }}
   {{- end }}
   labels:
-    app: {{ template "name" . }}
-    chart: {{ template "chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-    {{- if .Values.monitoring.serviceMonitor.labels }}
-    {{ toYaml .Values.monitoring.serviceMonitor.labels | trim | nindent 4 }}
+    {{- include "openconfig.labels" . | trim | nindent 4 }}
+    {{- with .Values.monitoring.serviceMonitor.labels }}
+    {{- toYaml . | trim | nindent 4 }}
     {{- end }}
 spec:
   endpoints:
   - interval: {{ .Values.monitoring.serviceMonitor.interval | default "60s" }}
-    {{- if .Values.monitoring.serviceMonitor.path }}
-    path: {{ .Values.monitoring.serviceMonitor.path }}
+    {{- with .Values.monitoring.serviceMonitor.path }}
+    path: {{ . | quote }}
     {{- end }}
     scrapeTimeout: {{ .Values.monitoring.serviceMonitor.timeout | default "30s" }}
     targetPort: {{ .Values.monitoring.serviceMonitor.port }}
@@ -28,9 +25,8 @@ spec:
     - {{ .Values.monitoring.serviceMonitor.selectorNamespace | default .Release.Namespace }}
   selector:
     matchLabels:
-      app: {{ template "name" . }}
-      release: {{ .Release.Name }}
-      {{-  if .Values.monitoring.serviceMonitor.labels }}
-      {{ toYaml .Values.monitoring.serviceMonitor.selectorLabels }}
+      {{- include "openconfig.selectorLabels" . | trim | nindent 6 }}
+      {{- with .Values.monitoring.serviceMonitor.selectorLabels }}
+      {{- toYaml . | trim | nindent 6 }}
       {{- end }}
 {{- end }}
