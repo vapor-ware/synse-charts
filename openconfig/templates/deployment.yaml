@@ -1,63 +1,61 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "fullname" . }}
+  name: {{ include "openconfig.fullname" . }}
   labels:
-    synse-component: plugin
-    app: {{ template "name" . }}
-    chart: {{ template "chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-    {{- if .Values.deployment.labels }}
-    {{- toYaml .Values.deployment.labels | trim | nindent 4 }}
+    {{- include "openconfig.labels" . | trim | nindent 4 }}
+    {{- with .Values.deployment.labels }}
+    {{- toYaml . | trim | nindent 4 }}
     {{- end }}
   {{- if .Values.deployment.annotations }}
   annotations:
     {{- toYaml .Values.deployment.annotations | trim | nindent 4 }}
   {{- end }}
 spec:
+  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.deployment.replicas }}
+  {{- end }}
   selector:
     matchLabels:
-      synse-component: plugin
-      app: {{ template "name" . }}
-      release: {{ .Release.Name }}
+      {{- include "openconfig.selectorLabels" . | trim | nindent 6 }}
   template:
     metadata:
-      name: {{ template "fullname" . }}
+      name: {{ include "openconfig.fullname" . }}
       labels:
-        synse-component: plugin
-        app: {{ template "name" . }}
-        chart: {{ template "chart" . }}
-        release: {{ .Release.Name }}
-        {{- if .Values.pod.labels }}
-        {{- toYaml .Values.pod.labels | trim | nindent 8 }}
+        {{- include "openconfig.selectorLabels" . | trim | nindent 8 }}
+        {{- with .Values.pod.labels }}
+        {{- toYaml . | trim | nindent 8 }}
         {{- end }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
-        {{- if .Values.pod.annotations }}
-        {{- toYaml .Values.pod.annotations | trim | nindent 8 }}
+        {{- with .Values.pod.annotations }}
+        {{- toYaml . | trim | nindent 8 }}
         {{- end }}
     spec:
       terminationGracePeriodSeconds: 3
+      serviceAccountName: {{ include "openconfig.serviceAccountName" . }}
+      {{- with .Values.pod.securityContext }}
       securityContext:
-        {{- toYaml .Values.pod.securityContext | trim | nindent 8 }}
+        {{- toYaml . | trim | nindent 8 }}
+      {{- end }}
       {{- if .Values.config }}
       volumes:
         - name: config
           configMap:
-            name: {{ template "fullname" . }}-config
+            name: {{ include "openconfig.fullname" . }}-config
         {{- if .Values.tls.enabled }}
         - name: tls-secrets
           secret:
-            secretName: {{ template "fullname" . }}-tls-secrets
+            secretName: {{ include "openconfig.fullname" . }}-tls-secrets
         {{- end }}
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}
+          {{- with .Values.securityContext }}
           securityContext:
-            {{- toYaml .Values.securityContext | trim | nindent 12 }}
-          image: "{{ .Values.image.registry }}{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+            {{- toYaml . | trim | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.image.registry }}{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
@@ -68,14 +66,14 @@ spec:
               containerPort: 2112
               protocol: TCP
             {{- end }}
-          {{- if .Values.args }}
-          args: {{ .Values.args }}
+          {{- with .Values.args }}
+          args: {{ . }}
           {{- end }}
           env:
             - name: PLUGIN_METRICS_ENABLED
               value: {{ .Values.metrics.enabled | quote }}
-            {{- if .Values.env }}
-            {{- toYaml .Values.env | trim | nindent 12}}
+            {{- with .Values.env }}
+            {{- toYaml . | trim | nindent 12}}
             {{- end }}
           {{- if (or .Values.config .Values.tls.enabled) }}
           volumeMounts:
@@ -113,11 +111,19 @@ spec:
                 - /etc/synse/plugin/healthy
           {{- end }}
           {{- end }}
+          {{- with .Values.resources}}
           resources:
-            {{- toYaml .Values.resources | trim | nindent 12 }}
+            {{- toYaml . | trim | nindent 12 }}
+          {{- end }}
+      {{- with .Values.nodeSelector }}
       nodeSelector:
-        {{- toYaml .Values.nodeSelector | trim | nindent 8 }}
+        {{- toYaml . | trim | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
       affinity:
-        {{- toYaml .Values.affinity | trim | nindent 8 }}
+        {{- toYaml . | trim | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
       tolerations:
-        {{- toYaml .Values.tolerations | trim | nindent 8 }}
+        {{- toYaml . | trim | nindent 8 }}
+      {{- end }}

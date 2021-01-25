@@ -1,19 +1,15 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "fullname" . }}
+  name: {{ include "openconfig.fullname" . }}
   labels:
-    synse-component: plugin
-    app: {{ template "name" . }}
-    chart: {{ template "chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-    {{- if .Values.service.labels }}
-    {{- toYaml .Values.service.labels | trim | nindent 4 }}
+    {{- include "openconfig.labels" . | trim | nindent 4 }}
+    {{- with .Values.service.labels }}
+    {{- toYaml . | trim | nindent 4 }}
     {{- end }}
-  {{- if .Values.service.annotations }}
+  {{- with .Values.service.annotations }}
   annotations:
-    {{- toYaml .Values.service.annotations | trim | nindent 4 }}
+    {{- toYaml . | trim | nindent 4 }}
   {{- end }}
 spec:
   type: {{ .Values.service.type | default "ClusterIP" }}
@@ -23,23 +19,18 @@ spec:
       protocol: TCP
       name: http
   selector:
-    synse-component: plugin
-    app: {{ template "name" . }}
-    release: {{ .Release.Name }}
+    {{- include "openconfig.selectorLabels" . | nindent 4 }}
 
 {{- if .Values.metrics.enabled }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "fullname" . }}-metrics
+  name: {{ include "openconfig.fullname" . }}-metrics
   labels:
-    app: {{ template "name" . }}
-    chart: {{ template "chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-    {{- if .Values.metrics.labels }}
-    {{- toYaml .Values.metrics.labels | trim | nindent 4 }}
+    {{- include "openconfig.labels" . | trim | nindent 4 }}
+    {{- with .Values.metrics.labels }}
+    {{- toYaml . | trim | nindent 4 }}
     {{- end }}
 spec:
   clusterIP: None
@@ -48,7 +39,5 @@ spec:
       targetPort: metrics
       name: metrics
   selector:
-    synse-component: plugin
-    app: {{ template "name" . }}
-    release: {{ .Release.Name }}
+    {{- include "openconfig.selectorLabels" . | nindent 4 }}
 {{- end }}

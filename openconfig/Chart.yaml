@@ -1,8 +1,10 @@
-apiVersion: v1
+apiVersion: v2
 name: openconfig
-version: 0.2.4
-appVersion: 0.2.0
 description: Synse plugin to collect networking telemetry with OpenConfig over gRPC
+
+type: application
+version: 1.0.0
+appVersion: 0.2.0
 home: https://github.com/vapor-ware/synse-openconfig-plugin
 icon: https://charts.vapor.io/.images/synse-server-chart.jpg
 sources:

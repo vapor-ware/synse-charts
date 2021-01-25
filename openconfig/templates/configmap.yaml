@@ -3,13 +3,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "fullname" . }}-config
+  name: {{ include "openconfig.fullname" . }}-config
   labels:
-    synse-component: plugin
-    app: {{ template "name" . }}
-    chart: {{ template "chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    {{- include "openconfig.labels" . | nindent 4 }}
 data:
   config.yml: {{ toYaml .Values.config | quote }}
 {{- end }}
