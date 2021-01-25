@@ -38,11 +38,13 @@ spec:
       securityContext:
         {{- toYaml . | trim | nindent 8 }}
       {{- end }}
-      {{- if .Values.config }}
+      {{- if (or .Values.config .Values.tls.enabled) }}
       volumes:
+        {{- if .Values.config }}
         - name: config
           configMap:
             name: {{ include "openconfig.fullname" . }}-config
+        {{- end }}
         {{- if .Values.tls.enabled }}
         - name: tls-secrets
           secret:
