@@ -30,7 +30,7 @@ spec:
     matchLabels:
       app: {{ template "name" . }}
       release: {{ .Release.Name }}
-      {{-  if .Values.monitoring.serviceMonitor.labels }}
+      {{-  if .Values.monitoring.serviceMonitor.selectorLabels }}
       {{ toYaml .Values.monitoring.serviceMonitor.selectorLabels }}
       {{- end }}
 {{- end }}
