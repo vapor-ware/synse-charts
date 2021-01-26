@@ -12,7 +12,7 @@ fullnameOverride: ""
 image:
   registry: "" # Add a registry if we need to use the non-default one
   repository: vaporio/snmp-plugin
-  tag: "2.0.3"
+  tag: "2.0.4"
   pullPolicy: Always
 
 ## Enable/disable application metrics export via Prometheus.
