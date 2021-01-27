@@ -74,6 +74,13 @@ spec:
           env:
             - name: PLUGIN_METRICS_ENABLED
               value: {{ .Values.metrics.enabled | quote }}
+            {{- range $secret := .Values.secrets }}
+            - name: {{ $secret.name | upper }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $secret.name }}
+                  key: secret
+            {{- end }}
             {{- with .Values.env }}
             {{- toYaml . | trim | nindent 12}}
             {{- end }}

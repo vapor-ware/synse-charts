@@ -64,6 +64,13 @@ tls:
   cert: ""
   ca: ""
 
+## Secret values, typically OpenConfig auth passwords, to generate Secrets
+## from and mount those secrets into the container via environment variable.
+## ref: https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables
+secrets: []
+#  - name: my_secret
+#    value: foobar
+
 ## Service configuration options.
 ## ref: http://kubernetes.io/docs/user-guide/services/
 service:
