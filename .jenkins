@@ -1,50 +1,12 @@
-pipeline {
+#!/usr/bin/env groovy
 
-  agent any
+library identifier: 'vapor@1.2.0', retriever: modernSCM([
+    $class: 'GitSCMSource',
+    remote: 'https://github.com/vapor-ware/ci-shared.git',
+    credentialsId: 'vio-bot-gh',
+])
 
-  options {
-    retry(2)
-  }
-
-  stages {
-    stage('Checkout') {
-      steps {
-        checkout scm
-      }
-    }
-    stage('Tools') {
-      steps {
-        sh 'helm3 version --client'
-      }
-    }
-    stage('Lint') {
-      steps {
-        sh 'helm3 lint */'
-      }
-    }
-    stage('Publish') {
-      when {
-        branch 'master'
-      }
-      environment {
-        GOOGLE_APPLICATION_CREDENTIALS = credentials('vio-build-gcp-serviceaccount')
-      }
-      steps {
-        // Create our staging repos
-        sh 'mkdir -p .chart-repo .chart-staging'
-        // Mount .chart-repo to Google Cloud Storage
-        sh 'gcsfuse charts.vapor.io .chart-repo'
-        // Build packages in .chart-staging, move new ones to .chart-repo (gcs), create new index
-        sh 'helm3 package --dependency-update --destination .chart-staging */'
-        sh 'cp -vn .chart-staging/*.tgz .chart-repo/'
-        sh 'helm3 repo index --url https://charts.vapor.io .chart-repo'
-        sh 'gsutil setmeta -h "Cache-Control:no-cache,max-age=0"  -h "Content-Type:text/yaml" -h "Content-Encoding:UTF-8" gs://charts.vapor.io/*.yaml'
-      }
-      post {
-        always {
-          sh 'fusermount -u .chart-repo && rm -rf .chart-staging .chart-repo'
-        }
-      }
-    }
-  }
-}
+chartPublishPipeline([
+  'chartsGlob': '*/',
+  'repoURL': 'charts.vapor.io',
+])
