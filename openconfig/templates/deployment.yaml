@@ -78,7 +78,7 @@ spec:
             - name: {{ $secret.name | upper }}
               valueFrom:
                 secretKeyRef:
-                  name: {{ $secret.name }}
+                  name: {{ $secret.name | replace "_" "-" }}
                   key: secret
             {{- end }}
             {{- with .Values.env }}
