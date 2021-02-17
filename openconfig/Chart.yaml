@@ -3,7 +3,7 @@ name: openconfig
 description: Synse plugin to collect networking telemetry with OpenConfig over gRPC
 
 type: application
-version: 1.1.2
+version: 1.1.3
 appVersion: v0.3.1
 home: https://github.com/vapor-ware/synse-openconfig-plugin
 icon: https://charts.vapor.io/.images/synse-server-chart.jpg
