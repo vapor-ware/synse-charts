@@ -1,6 +1,7 @@
-apiVersion: v1
+apiVersion: v2
+type: application
 name: snmp-ups
-version: 0.2.2
+version: 1.0.0
 appVersion: 0.1.0
 description: SNMP plugin the RFC1628 UPS MIB
 home: https://github.com/vapor-ware/synse-snmp-ups-plugin
