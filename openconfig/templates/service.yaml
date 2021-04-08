@@ -2,22 +2,26 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ include "openconfig.fullname" . }}
-  labels:
-    {{- include "openconfig.labels" . | trim | nindent 4 }}
-    {{- with .Values.service.labels }}
-    {{- toYaml . | trim | nindent 4 }}
-    {{- end }}
   {{- with .Values.service.annotations }}
   annotations:
     {{- toYaml . | trim | nindent 4 }}
   {{- end }}
+  labels:
+    vapor.io/synse: plugin
+    {{- include "openconfig.labels" . | nindent 4 }}
+    {{- with .Values.service.labels }}
+    {{- toYaml . | trim | nindent 4 }}
+    {{- end }}
+    {{- with .Values.globalLabels }}
+    {{- toYaml . | trim | nindent 4 }}
+    {{- end }}
 spec:
   type: {{ .Values.service.type | default "ClusterIP" }}
   ports:
-    - port: {{ .Values.service.port }}
+    - name: http
+      port: {{ .Values.service.port }}
       targetPort: http
       protocol: TCP
-      name: http
   selector:
     {{- include "openconfig.selectorLabels" . | nindent 4 }}
 
@@ -28,16 +32,20 @@ kind: Service
 metadata:
   name: {{ include "openconfig.fullname" . }}-metrics
   labels:
-    {{- include "openconfig.labels" . | trim | nindent 4 }}
+    {{- include "openconfig.labels" . | nindent 4 }}
     {{- with .Values.metrics.labels }}
+    {{- toYaml . | trim | nindent 4 }}
+    {{- end }}
+    {{- with .Values.globalLabels }}
     {{- toYaml . | trim | nindent 4 }}
     {{- end }}
 spec:
   clusterIP: None
   ports:
-    - port: 2112
+    - name: metrics
+      port: 2112
       targetPort: metrics
-      name: metrics
+      protocol: TCP
   selector:
     {{- include "openconfig.selectorLabels" . | nindent 4 }}
 {{- end }}

@@ -5,7 +5,10 @@ kind: ConfigMap
 metadata:
   name: {{ include "openconfig.fullname" . }}-config
   labels:
-    {{- include "openconfig.labels" . | nindent 4 }}
+    {{- include "openconfig.labels" . | trim | nindent 4 }}
+    {{- with .Values.globalLabels }}
+    {{- toYaml . | trim | nindent 4 }}
+    {{- end }}
 data:
   config.yml: {{ toYaml .Values.config | quote }}
 {{- end }}
