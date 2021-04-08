@@ -2,26 +2,25 @@
   Synse Server only needs a ClusterRole definition if plugin discovery
   via the Kubernetes API is configured.
 */ -}}
-
 {{- if .Values.rbac.create }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{ template "fullname" . }}
+  name: {{ include "synse-server.fullname" . }}
   labels:
-    app: {{ template "name" . }}
-    chart: {{ template "chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    {{- include "synse-server.labels" . | trim | nindent 4 }}
+    {{- with .Values.globalLabels }}
+    {{- toYaml . | trim | nindent 4 }}
+    {{- end }}
 rules:
-# Core API Group
-- apiGroups: [""]
-  # Synse Server plugin discovery currently operates on Endpoint resources.
-  # If support for more resources is added, this should be updated accordingly.
-  resources:
-  - "endpoints"
-  verbs:
-  - "get"
-  - "watch"
-  - "list"
+  # Core API Group
+  - apiGroups: [""]
+    # Synse Server plugin discovery currently operates on Endpoint resources.
+    # If support for more resources is added, this should be updated accordingly.
+    resources:
+      - "endpoints"
+    verbs:
+      - "get"
+      - "watch"
+      - "list"
 {{- end }}

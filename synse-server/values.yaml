@@ -8,6 +8,27 @@ nameOverride: ""
 ## Fully override the fullname template.
 fullnameOverride: ""
 
+## Synse Server configuration. This configuration is placed into a ConfigMap where
+## it is then mounted into the container. The config options here can be overridden
+## with environment variables, if desired. For more information on configuring Synse
+## Server, see: https://synse.readthedocs.io/en/latest/server/user/configuration/
+config: {}
+
+## Labels applied to all manifest objects for the Chart.
+globalLabels: {}
+
+## Image configuration options.
+image:
+  registry: ""
+  repository: vaporio/synse-server
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+## Pull secrets for pulling private images.
+imagePullSecrets: []
+#  - name: my-pull-secret
+
 ## Enable/disable the creation of a ClusterRole, ClusterRoleBinding, and
 ## ServiceAccount. This is false by default, as Synse does not need additional
 ## permissions with its default settings.
@@ -21,46 +42,33 @@ rbac:
 metrics:
   enabled: false
 
-## Prometheus monitoring
-monitoring:
-  serviceMonitor:
-    enabled: false
-    name: synse-server-monitor
-    port: http
-    path: "/metrics"
-    timeout: 4s
-    interval: 5s
-
-    # Deploy the ServiceMonitor to a namespace other than the target for the Release. Required in some setups.
-    namespace: ""
-    # Which namespace the prometheus tooling should interrogate to find services and pods.
-    selectorNamespace: ""
-    # Labels used to select the services/pods to monitor.
-    selectorLabels: {}
-    # Labels applied to the ServiceMonitor.
-    labels: {}
-      #vapor.io/monitor: application
-
-## Image configuration options.
-image:
-  registry: "" # Add a registry if we need to use the non-default one
-  repository: vaporio/synse-server
-  tag: "v3.2.0"
-  pullPolicy: Always
-
 ## Deployment configuration options.
+## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
 deployment:
   annotations: {}
   labels: {}
   replicas: 1
 
-## Pod configuration options.
+## Configuration options for container security context.
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+## Pod-specific configuration options.
+## ref: https://kubernetes.io/docs/concepts/workloads/pods/
 pod:
   annotations: {}
   labels: {}
+  securityContext: {}
+    # fsGroup: 2000
 
 ## Service configuration options.
-## ref: http://kubernetes.io/docs/user-guide/services/
+## ref: https://kubernetes.io/docs/concepts/services-networking/service/
 service:
   annotations: {}
   labels: {}
@@ -72,51 +80,103 @@ service:
 ingress:
   enabled: false
   annotations: {}
-  # kubernetes.io/ingress.class: nginx
-  # kubernetes.io/tls-acme: "true"
+    # kubernetes.io/ingress.class: internal
+    # cert-manager.io/cluster-issuer: le-gdns
   labels: {}
-  hostname: ""
+  hosts: []
+  #  - host: chart-example.local
+  #    paths: []
   tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
 
-## Readiness and liveness probe configuration options
+## Prometheus monitoring configuration.
+## ref: https://docs.openshift.com/container-platform/4.4/rest_api/monitoring_apis/servicemonitor-monitoring-coreos-com-v1.html
+serviceMonitor:
+  enabled: false
+  name: synse-server-monitor
+  port: http
+  path: /metrics
+  timeout: 4s
+  interval: 5s
+
+  namespace: ""
+  labels: {}
+    # vapor.io/monitor: application
+
+  selectorNamespace: ""
+  selectorLabels: {}
+
+## Configuration options for a PodDisruptionBudget.
+## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/#specifying-a-poddisruptionbudget
+podDisruptionBudget:
+  enabled: false
+  annotations: {}
+  labels: {}
+#  minAvailable: 2
+#  maxUnavailable: 1
+
+## Configuration options for pod security policies.
+## ref: https://kubernetes.io/docs/concepts/policy/pod-security-policy/
+podSecurityPolicy:
+  enabled: false
+  name: ""
+  annotations: {}
+  labels: {}
+  allowances: {}
+#    privileged: false
+#    seLinux:
+#      rule: RunAsAny
+#    supplementalGroups:
+#      rule: RunAsAny
+#    runAsUser:
+#      rule: RunAsAny
+#    fsGroup:
+#      rule: RunAsAny
+#    volumes:
+#      - '*'
+
+## Readiness and liveness probe configuration options.
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/
 livenessProbe:
   enabled: true
-  initialDelaySeconds: 30
-  timeoutSeconds: 5
+  initialDelaySeconds: 10
+  timeoutSeconds: 3
   periodSeconds: 5
+  failureThreshold: 2
+
 readinessProbe:
   enabled: true
-  initialDelaySeconds: 5
-  timeoutSeconds: 2
+  initialDelaySeconds: 10
+  timeoutSeconds: 3
   periodSeconds: 5
-
-## Specify arguments to pass to the container. By default, no arguments are passed.
-args: []
+  failureThreshold: 2
 
 ## Allow pass-through environment variable configuration.
-env: {}
+## ref: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/
+env: []
+  # - name: FOO
+  #   value: bar
 
 ## Configure resource requests and limits.
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
-resources:
-  requests: {}
-  limits: {}
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
 
-## Node labels for pod assignment
-## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+## Node labels for pod assignment.
+## ref: https://kubernetes.io/docs/user-guide/node-selection/
 nodeSelector: {}
 
-## Tolerations for pod assignment
-## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+## Tolerations for pod assignment.
+## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
 tolerations: []
 
-## Affinity for pod assignment
-## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+## Affinity for pod assignment.
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
 affinity: {}
-
-## Synse Server configuration. This configuration is placed into a ConfigMap where
-## it is then mounted into the container. The config options here can be overridden
-## with environment variables, if desired. For more information on configuring Synse
-## Server, see: https://synse.readthedocs.io/en/latest/server/user/configuration/
-config: {}

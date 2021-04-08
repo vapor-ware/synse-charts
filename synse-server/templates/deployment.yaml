@@ -1,109 +1,114 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ template "fullname" . }}
+  name: {{ include "synse-server.fullname" . }}
   labels:
-    app: {{ template "name" . }}
-    chart: {{ template "chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-    {{- if .Values.deployment.labels }}
-    {{- toYaml .Values.deployment.labels | trim | nindent 4 }}
+    {{- include "synse-server.labels" . | trim | nindent 4 }}
+    {{- with .Values.deployment.labels }}
+    {{- toYaml . | trim | nindent 4 }}
     {{- end }}
-  {{- if .Values.deployment.annotations }}
+    {{- with .Values.globalLabels }}
+    {{- toYaml . | trim | nindent 4 }}
+    {{- end }}
+  {{- with .Values.deployment.annotations }}
   annotations:
-    {{- toYaml .Values.deployment.annotations | trim | nindent 4 }}
+    {{- toYaml . | trim | nindent 4 }}
   {{- end }}
 spec:
   replicas: {{ .Values.deployment.replicas }}
   selector:
     matchLabels:
-      app: {{ template "name" . }}
-      release: {{ .Release.Name }}
+      {{- include "synse-server.selectorLabels" . | trim | nindent 6 }}
   template:
     metadata:
-      name: {{ template "fullname" . }}
-      labels:
-        app: {{ template "name" . }}
-        chart: {{ template "chart" . }}
-        release: {{ .Release.Name }}
-        {{- if .Values.pod.labels }}
-        {{- toYaml .Values.pod.labels | trim | nindent 8 }}
-        {{- end }}
+      name: {{ include "synse-server.fullname" . }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
-        {{- if .Values.pod.annotations }}
-        {{- toYaml .Values.pod.annotations | trim | nindent 8 }}
+        {{- with .Values.pod.annotations }}
+        {{- toYaml . | trim | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "synse-server.selectorLabels" . | trim | nindent 8 }}
+        {{- with .Values.pod.labels }}
+        {{- toYaml . | trim | nindent 8 }}
         {{- end }}
     spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | trim | nindent 8 }}
+      {{- end }}
       terminationGracePeriodSeconds: 3
-      {{- if .Values.rbac.create }}
-      # Synse Server is configured to run with plugin discovery using the Kubernetes
-      # API. Use the ServiceAccount to give it the proper cluster permissions.
-      serviceAccountName: {{ template "fullname" . }}
+      serviceAccountName: {{ include "synse-server.serviceAccountName" . }}
+      {{- with .Values.pod.securityContext }}
+      securityContext:
+        {{- toYaml . | trim | nindent 8 }}
       {{- end }}
       {{- if .Values.config }}
       volumes:
-      - name: config
-        configMap:
-          name: {{ template "fullname" . }}-config
+        - name: config
+          configMap:
+            name: {{ include "synse-server.fullname" . }}-config
       {{- end }}
       containers:
-      - name: {{ .Chart.Name }}
-        image: {{ .Values.image.registry }}{{ .Values.image.repository }}:{{ .Values.image.tag }}
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
-        ports:
-        - name: http
-          containerPort: {{ .Values.service.port }}
-        {{- if .Values.args }}
-        args: {{ .Values.args }}
-        {{- end }}
-        env:
-          - name: SYNSE_METRICS_ENABLED
-            value: {{ .Values.metrics.enabled | quote }}
-          {{- if .Values.env }}
-          {{- toYaml .Values.env | trim | nindent 10 }}
+        - name: {{ .Chart.Name }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
           {{- end }}
-        {{- if .Values.livenessProbe.enabled }}
-        {{- with .Values.livenessProbe }}
-        livenessProbe:
-          initialDelaySeconds: {{ .initialDelaySeconds }}
-          timeoutSeconds: {{ .timeoutSeconds }}
-          periodSeconds: {{ .periodSeconds }}
-          httpGet:
-            path: /test
-            port: http
-        {{- end }}
-        {{- end }}
-        {{- if .Values.readinessProbe.enabled }}
-        {{- with .Values.readinessProbe }}
-        readinessProbe:
-          initialDelaySeconds: {{ .initialDelaySeconds }}
-          timeoutSeconds: {{ .timeoutSeconds }}
-          periodSeconds: {{ .periodSeconds }}
-          httpGet:
-            path: /test
-            port: http
-        {{- end }}
-        {{- end }}
-        {{- if .Values.config }}
-        volumeMounts:
-        - name: config
-          mountPath: /etc/synse/server
-        {{- end }}
-        {{ if .Values.resources -}}
-        resources:
-          {{- toYaml .Values.resources | trim | nindent 10 }}
-        {{- end }}
-      {{- if .Values.nodeSelector }}
+          image: "{{ .Values.image.registry }}{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          env:
+            - name: SYNSE_METRICS_ENABLED
+              value: {{ .Values.metrics.enabled | quote }}
+            {{- with .Values.env }}
+            {{- toYaml . | trim | nindent 12 }}
+            {{- end }}
+          {{- if .Values.livenessProbe.enabled }}
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            initialDelaySeconds: {{ .initialDelaySeconds }}
+            timeoutSeconds: {{ .timeoutSeconds }}
+            periodSeconds: {{ .periodSeconds }}
+            failureThreshold: {{ .failureThreshold }}
+            httpGet:
+              path: /test
+              port: http
+          {{- end }}
+          {{- end }}
+          {{- if .Values.readinessProbe.enabled }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            initialDelaySeconds: {{ .initialDelaySeconds }}
+            timeoutSeconds: {{ .timeoutSeconds }}
+            periodSeconds: {{ .periodSeconds }}
+            failureThreshold: {{ .failureThreshold }}
+            httpGet:
+              path: /test
+              port: http
+          {{- end }}
+          {{- end }}
+          {{- if .Values.config }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/synse/server
+          {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | trim | nindent 12 }}
+          {{- end }}
+      {{- with .Values.nodeSelector }}
       nodeSelector:
-        {{- toYaml .Values.nodeSelector | trim | nindent 8 }}
+        {{- toYaml . | trim | nindent 8 }}
       {{- end }}
-      {{- if .Values.tolerations }}
-      tolerations:
-        {{- toYaml .Values.tolerations | trim | nindent 8 }}
-      {{- end }}
-      {{- if .Values.affinity }}
+      {{- with .Values.affinity }}
       affinity:
-        {{- toYaml .Values.affinity | trim | nindent 8 }}
+        {{- toYaml . | trim | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | trim | nindent 8 }}
       {{- end }}
