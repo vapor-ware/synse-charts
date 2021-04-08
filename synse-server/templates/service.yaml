@@ -1,24 +1,25 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "fullname" . }}
-  labels:
-    app: {{ template "name" . }}
-    chart: {{ template "chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-    {{- if .Values.service.labels }}
-    {{- toYaml .Values.service.labels | trim | nindent 4 }}
-    {{- end }}
-  {{- if .Values.service.annotations }}
+  name: {{ include "synse-server.fullname" . }}
+  {{- with .Values.service.annotations }}
   annotations:
-    {{- toYaml .Values.service.annotations | trim | nindent 4 }}
+    {{- toYaml . | trim | nindent 4 }}
   {{- end }}
+  labels:
+    {{- include "synse-server.labels" . | nindent 4 }}
+    {{- with .Values.service.labels }}
+    {{- toYaml . | trim | nindent 4 }}
+    {{- end }}
+    {{- with .Values.globalLabels }}
+    {{- toYaml . | trim | nindent 4 }}
+    {{- end }}
 spec:
   type: {{ .Values.service.type }}
   ports:
-  - port: {{ .Values.service.port }}
-    name: http
+    - name: http
+      port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
   selector:
-    app: {{ template "name" . }}
-    release: {{ .Release.Name }}
+    {{- include "synse-server.selectorLabels" . | trim | nindent 4 }}
