@@ -1,54 +1,52 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "fullname" . }}
-  labels:
-    synse-component: plugin
-    app: {{ template "name" . }}
-    chart: {{ template "chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-    {{- if .Values.service.labels }}
-    {{- toYaml .Values.service.labels | trim | nindent 4 }}
-    {{- end }}
-  {{- if .Values.service.annotations }}
+  name: {{ include "snmp.fullname" . }}
+  {{- with .Values.service.annotations }}
   annotations:
-    {{- toYaml .Values.service.annotations | trim | nindent 4 }}
+    {{- toYaml . | trim | nindent 4 }}
   {{- end }}
+  labels:
+    vapor.io/synse: plugin
+    {{- include "snmp.labels" . | nindent 4 }}
+    {{- with .Values.service.labels }}
+    {{- toYaml . | trim | nindent 4 }}
+    {{- end }}
+    {{- with .Values.globalLabels }}
+    {{- toYaml . | trim | nindent 4 }}
+    {{- end }}
 spec:
   type: {{ .Values.service.type | default "ClusterIP" }}
   clusterIP: None
   ports:
-  - port: {{ .Values.service.port }}
-    targetPort: http
-    name: http
+    - name: http
+      port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
   selector:
-    synse-component: plugin
-    app: {{ template "name" . }}
-    release: {{ .Release.Name }}
+    {{- include "snmp.selectorLabels" . | trim | nindent 4 }}
 
 {{- if .Values.metrics.enabled }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "fullname" . }}-metrics
+  name: {{ include "snmp.fullname" . }}-metrics
   labels:
-    app: {{ template "name" . }}
-    chart: {{ template "chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-    {{- if .Values.metrics.labels }}
-    {{- toYaml .Values.metrics.labels | trim | nindent 4 }}
+    {{- include "snmp.labels" . | nindent 4 }}
+    {{- with .Values.metrics.labels }}
+    {{- toYaml . | trim | nindent 4 }}
+    {{- end }}
+    {{- with .Values.globalLabels }}
+    {{- toYaml . | trim | nindent 4 }}
     {{- end }}
 spec:
   clusterIP: None
   ports:
-    - port: 2112
+    - name: metrics
+      port: 2112
       targetPort: metrics
-      name: metrics
+      protocol: TCP
   selector:
-    synse-component: plugin
-    app: {{ template "name" . }}
-    release: {{ .Release.Name }}
+    {{- include "snmp.selectorLabels" . | trim | nindent 4 }}
 {{- end }}

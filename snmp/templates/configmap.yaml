@@ -1,34 +1,30 @@
-{{- if (or .Values.config .Values.devices) }}
 {{- if .Values.config }}
 # Plugin configuration
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "fullname" . }}-config
+  name: {{ include "snmp.fullname" . }}-config
   labels:
-    synse-component: plugin
-    app: {{ template "name" . }}
-    chart: {{ template "chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    {{- include "snmp.labels" . | trim | nindent 4 }}
+    {{- with .Values.globalLabels }}
+    {{- toYaml . | trim | nindent 4 }}
+    {{- end }}
 data:
   config.yml: {{ toYaml .Values.config | quote }}
 {{- end }}
+
 {{- if .Values.devices }}
 ---
-
 # Device configuration
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "fullname" . }}-devices
+  name: {{ include "snmp.fullname" . }}-devices
   labels:
-    synse-component: plugin
-    app: {{ template "name" . }}
-    chart: {{ template "chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    {{- include "snmp.labels" . | trim | nindent 4 }}
+    {{- with .Values.globalLabels }}
+    {{- toYaml . | trim | nindent 4 }}
+    {{- end }}
 data:
   config.yml: {{ toYaml .Values.devices | quote }}
-{{- end }}
 {{- end }}
