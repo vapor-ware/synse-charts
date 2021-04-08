@@ -8,47 +8,106 @@ nameOverride: ""
 ## Fully override the fullname template.
 fullnameOverride: ""
 
-## Image configuration options.
-image:
-  registry: "" # Add a registry if we need to use the non-default one
-  repository: vaporio/synse-loadgen
-  tag: "1.0.2"
-  pullPolicy: Always
-
-## Deployment configuration options.
-deployment:
-  annotations: {}
-  labels: {}
-  replicas: 1
-
-## Pod configuration options.
-pod:
-  annotations: {}
-  labels: {}
-
-## Allow pass-through environment variable configuration.
-env: {}
-
-## Configure resource requests and limits.
-## ref: http://kubernetes.io/docs/user-guide/compute-resources/
-resources:
-  requests: {}
-  limits: {}
-
-## Node labels for pod assignment
-## Ref: https://kubernetes.io/docs/user-guide/node-selection/
-nodeSelector: {}
-
-## Tolerations for pod assignment
-## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
-tolerations: []
-
-## Affinity for pod assignment
-## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
-affinity: {}
-
 ## Synse LoadGen configuration. This configuration is placed into a ConfigMap where
 ## it is then mounted into the container. The config options here can be overridden
 ## with environment variables, if desired. For more information, see:
 ## https://github.com/vapor-ware/synse-loadgen#configuring
 config: {}
+
+## Labels applied to all manifest objects for the Chart.
+globalLabels: {}
+
+## Image configuration options.
+image:
+  registry: ""
+  repository: vaporio/synse-loadgen
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+## Pull secrets for pulling private images.
+imagePullSecrets: []
+#  - name: my-pull-secret
+
+## Service account configuration options.
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+serviceAccount:
+  create: false
+  annotations: {}
+  labels: {}
+  ## The name of the service account to use.
+  ## If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+## Deployment configuration options.
+## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+deployment:
+  annotations: {}
+  labels: {}
+  replicas: 1
+
+## Configuration options for container security context.
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+## Pod-specific configuration options.
+## ref: https://kubernetes.io/docs/concepts/workloads/pods/
+pod:
+  annotations: {}
+  labels: {}
+  securityContext: {}
+    # fsGroup: 2000
+
+## Configuration options for pod security policies.
+## ref: https://kubernetes.io/docs/concepts/policy/pod-security-policy/
+podSecurityPolicy:
+  enabled: false
+  name: ""
+  annotations: {}
+  labels: {}
+  allowances: {}
+#    privileged: false
+#    seLinux:
+#      rule: RunAsAny
+#    supplementalGroups:
+#      rule: RunAsAny
+#    runAsUser:
+#      rule: RunAsAny
+#    fsGroup:
+#      rule: RunAsAny
+#    volumes:
+#      - '*'
+
+## Allow pass-through environment variable configuration.
+## ref: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/
+env: []
+  # - name: FOO
+  #   value: bar
+
+## Configure resource requests and limits.
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+## Node labels for pod assignment.
+## ref: https://kubernetes.io/docs/user-guide/node-selection/
+nodeSelector: {}
+
+## Tolerations for pod assignment.
+## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+tolerations: []
+
+## Affinity for pod assignment.
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+affinity: {}

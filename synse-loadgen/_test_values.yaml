@@ -1,0 +1,101 @@
+# A values.yaml file with options fully configured to exercise the full
+# extent of chart rendering.
+# The values do not need to be meaningful, but they should approximate
+# actual usage.
+
+config:
+  key: value
+
+globalLabels:
+  global-metadata: value
+
+image:
+  registry: docker.io/v1/
+  repository: vaporio/synse-loadgen
+  pullPolicy: Always
+  tag: test
+
+imagePullSecrets:
+  - name: my-pull-secret
+
+serviceAccount:
+  create: true
+  annotations:
+    rendered: test-value
+  labels:
+    rendered: test-value
+  name: example
+
+deployment:
+  annotations:
+    rendered: test-value
+  labels:
+    rendered: test-value
+  replicas: 1
+
+securityContext:
+   capabilities:
+     drop:
+     - ALL
+   readOnlyRootFilesystem: true
+   runAsNonRoot: true
+   runAsUser: 1000
+
+pod:
+  annotations:
+    rendered: test-value
+  labels:
+    rendered: test-value
+  securityContext:
+     fsGroup: 2000
+
+podSecurityPolicy:
+  enabled: true
+  name: psp
+  annotations:
+    rendered: test-value
+  labels:
+    rendered: test-value
+  allowances:
+    privileged: false
+    seLinux:
+      rule: RunAsAny
+    supplementalGroups:
+      rule: RunAsAny
+    runAsUser:
+      rule: RunAsAny
+    fsGroup:
+      rule: RunAsAny
+    volumes:
+      - '*'
+
+env:
+  - name: FOO
+    value: bar
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+nodeSelector:
+  disktype: ssd
+
+tolerations:
+  - key: example-key
+    operator: Exists
+    effect: NoSchedule
+
+affinity:
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+            - key: app
+              operator: In
+              values:
+                - store
+        topologyKey: "kubernetes.io/hostname"
