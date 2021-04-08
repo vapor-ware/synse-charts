@@ -2,19 +2,38 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-
 ## Partially override the fullname template (will maintain the release name).
 nameOverride: ""
 
 ## Fully override the fullname template.
 fullnameOverride: ""
 
+## Synse Plugin configuration.
+##
+## The plugin requires a plugin configuration to be provided. This should be
+## specified on a per-release level. It is left empty here.
+#config:
+#  version: 3
+#  debug: true
+#  network:
+#    type: tcp
+#    address: ":5010"
+config: {}
+
+## Labels applied to all manifest objects for the Chart.
+globalLabels: {}
+
 ## Image configuration options.
 image:
-  registry: "" # Add a registry if we need to use the non-default one
+  registry: ""
   repository: vaporio/juniper-jti-plugin
-  tag: "0.1.1"
   pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+## Pull secrets for pulling private images.
+imagePullSecrets: []
+#  - name: my-pull-secret
 
 ## Enable/disable application metrics export via Prometheus.
 metrics:
@@ -25,11 +44,46 @@ metrics:
   ## can differentiate the metrics service from other defined services.
   labels: {}
 
-## Service configurations for the plugin.
-## ref: http://kubernetes.io/docs/user-guide/services/
+## Service account configuration options.
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+serviceAccount:
+  create: false
+  annotations: {}
+  labels: {}
+  ## The name of the service account to use.
+  ## If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+## Deployment configuration options.
+## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+deployment:
+  annotations: {}
+  labels: {}
+  replicas: 1
+
+## Configuration options for container security context.
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+## Pod-specific configuration options.
+## ref: https://kubernetes.io/docs/concepts/workloads/pods/
+pod:
+  annotations: {}
+  labels: {}
+  securityContext: {}
+    # fsGroup: 2000
+
+## Service configuration options.
+## ref: https://kubernetes.io/docs/concepts/services-networking/service/
 ##
 ## The port here should match the network address in the
-## plugin configuration, below.
+## plugin configuration, above.
 service:
   # Configurations for the plugin's port connecting to Synse Server.
   synse:
@@ -54,68 +108,80 @@ service:
     annotations: {}
     labels: {}
 
-## Prometheus monitoring
-monitoring:
-  serviceMonitor:
-    enabled: false
-    name: juniper-jti-monitor
-    port: metrics
-    path: "/metrics"
-    timeout: 4s
-    interval: 5s
+## Prometheus monitoring configuration.
+## ref: https://docs.openshift.com/container-platform/4.4/rest_api/monitoring_apis/servicemonitor-monitoring-coreos-com-v1.html
+serviceMonitor:
+  enabled: false
+  name: juniper-jti-monitor
+  port: metrics
+  path: /metrics
+  timeout: 4s
+  interval: 5s
 
-    # Deploy the ServiceMonitor to a namespace other than the target for the Release. Required in some setups.
-    namespace: ""
-    # Which namespace the prometheus tooling should interrogate to find services and pods.
-    selectorNamespace: ""
-    # Labels used to select the services/pods to monitor.
-    selectorLabels: {}
-    # Labels applied to the ServiceMonitor.
-    labels: {}
-      #vapor.io/monitor: application
+  namespace: ""
+  labels: {}
+    # vapor.io/monitor: application
 
-## Deployment configuration options.
-deployment:
+  selectorNamespace: ""
+  selectorLabels: {}
+
+## Configuration options for a PodDisruptionBudget.
+## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/#specifying-a-poddisruptionbudget
+podDisruptionBudget:
+  enabled: false
   annotations: {}
   labels: {}
-  replicas: 1
+#  minAvailable: 2
+#  maxUnavailable: 1
 
-## Pod configuration options.
-pod:
+## Configuration options for pod security policies.
+## ref: https://kubernetes.io/docs/concepts/policy/pod-security-policy/
+podSecurityPolicy:
+  enabled: false
+  name: ""
   annotations: {}
   labels: {}
-  securityContext: {}
-    # fsGroup: 2000
+  allowances: {}
+#    privileged: false
+#    seLinux:
+#      rule: RunAsAny
+#    supplementalGroups:
+#      rule: RunAsAny
+#    runAsUser:
+#      rule: RunAsAny
+#    fsGroup:
+#      rule: RunAsAny
+#    volumes:
+#      - '*'
 
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
-
-## Readiness and liveness probe configuration options
+## Readiness and liveness probe configuration options.
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/
 livenessProbe:
   enabled: true
-  initialDelaySeconds: 15
-  timeoutSeconds: 2
+  initialDelaySeconds: 10
+  timeoutSeconds: 3
   periodSeconds: 5
+  failureThreshold: 2
+
 readinessProbe:
   enabled: true
-  initialDelaySeconds: 5
-  timeoutSeconds: 2
+  initialDelaySeconds: 10
+  timeoutSeconds: 3
   periodSeconds: 5
+  failureThreshold: 2
 
-## Pass arguments to the plugin container. For additional startup
-## logging, you can pass the --debug flag. By default, no additional
-## arguments are passed to the container.
+## Specify arguments to pass to the container. By default, no arguments are passed.
+## ref: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/
+##
+## For additional startup logging, you can pass the --debug flag.
 #args: ["--debug"]
 args: []
 
 ## Allow pass-through environment variable configuration.
+## ref: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/
 env: []
+  # - name: FOO
+  #   value: bar
 
 ## Configure resource requests and limits.
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
@@ -127,25 +193,14 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
-## Node labels for pod assignment
-## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+## Node labels for pod assignment.
+## ref: https://kubernetes.io/docs/user-guide/node-selection/
 nodeSelector: {}
 
-## Tolerations for pod assignment
-## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+## Tolerations for pod assignment.
+## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
 tolerations: []
 
-## Affinity for pod assignment
-## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+## Affinity for pod assignment.
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
 affinity: {}
-
-## Synse Plugin configuration.
-## The plugin requires a plugin configuration to be provided. This should be
-## specified on a per-release level. It is left empty here.
-#config:
-#  version: 3
-#  debug: true
-#  network:
-#    type: tcp
-#    address: ":5010"
-config: {}

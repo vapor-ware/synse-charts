@@ -1,77 +1,82 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "fullname" . }}
+  name: {{ include "juniper-jti.fullname" . }}
   labels:
-    synse-component: plugin
-    app: {{ template "name" . }}
-    chart: {{ template "chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-    {{- if .Values.deployment.labels }}
-    {{- toYaml .Values.deployment.labels | trim | nindent 4 }}
+    {{- include "juniper-jti.labels" . | trim | nindent 4 }}
+    {{- with .Values.deployment.labels }}
+    {{- toYaml . | trim | nindent 4 }}
     {{- end }}
-  {{- if .Values.deployment.annotations }}
+    {{- with .Values.globalLabels }}
+    {{- toYaml . | trim | nindent 4 }}
+    {{- end }}
+  {{- with .Values.deployment.annotations }}
   annotations:
-    {{- toYaml .Values.deployment.annotations | trim | nindent 4 }}
+    {{- toYaml . | trim | nindent 4 }}
   {{- end }}
 spec:
   replicas: {{ .Values.deployment.replicas }}
   selector:
     matchLabels:
-      synse-component: plugin
-      app: {{ template "name" . }}
-      release: {{ .Release.Name }}
+      {{- include "juniper-jti.selectorLabels" . | trim | nindent 6 }}
   template:
     metadata:
-      name: {{ template "fullname" . }}
-      labels:
-        synse-component: plugin
-        app: {{ template "name" . }}
-        chart: {{ template "chart" . }}
-        release: {{ .Release.Name }}
-        {{- if .Values.pod.labels }}
-        {{- toYaml .Values.pod.labels | trim | nindent 8 }}
-        {{- end }}
+      name: {{ include "juniper-jti.fullname" . }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
-        {{- if .Values.pod.annotations }}
-        {{- toYaml .Values.pod.annotations | trim | nindent 8 }}
+        {{- with .Values.pod.annotations }}
+        {{- toYaml . | trim | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "juniper-jti.selectorLabels" . | trim | nindent 8 }}
+        {{- with .Values.pod.labels }}
+        {{- toYaml . | trim | nindent 8 }}
         {{- end }}
     spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | trim | nindent 8 }}
+      {{- end }}
       terminationGracePeriodSeconds: 3
+      serviceAccountName: {{ include "juniper-jti.serviceAccountName" . }}
+      {{- with .Values.pod.securityContext }}
       securityContext:
-        {{- toYaml .Values.pod.securityContext | trim | nindent 8 }}
+        {{- toYaml . | trim | nindent 8 }}
+      {{- end }}
       {{- if .Values.config }}
       volumes:
         - name: config
           configMap:
-            name: {{ template "fullname" . }}-config
+            name: {{ include "juniper-jti.fullname" . }}-config
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}
+          {{- with .Values.securityContext }}
           securityContext:
-            {{- toYaml .Values.securityContext | trim | nindent 12 }}
-          image: "{{ .Values.image.registry }}{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.image.registry }}{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
               containerPort: {{ .Values.service.synse.port }}
+              protocol: TCP
             - name: jti
               containerPort: {{ .Values.service.jti.port }}
               protocol: UDP
             {{- if .Values.metrics.enabled }}
             - name: metrics
               containerPort: 2112
+              protocol: TCP
             {{- end }}
-          {{- if .Values.args }}
-          args: {{ .Values.args }}
+          {{- with .Values.args }}
+          args: {{ . }}
           {{- end }}
           env:
             - name: PLUGIN_METRICS_ENABLED
               value: {{ .Values.metrics.enabled | quote }}
-            {{- if .Values.env }}
-            {{- toYaml .Values.env | trim | nindent 12}}
+            {{- with .Values.env }}
+            {{- toYaml . | trim | nindent 12 }}
             {{- end }}
           {{- if .Values.config }}
           volumeMounts:
@@ -85,6 +90,7 @@ spec:
             initialDelaySeconds: {{ .initialDelaySeconds }}
             timeoutSeconds: {{ .timeoutSeconds }}
             periodSeconds: {{ .periodSeconds }}
+            failureThreshold: {{ .failureThreshold }}
             exec:
               command:
                 - /bin/exists
@@ -97,17 +103,26 @@ spec:
             initialDelaySeconds: {{ .initialDelaySeconds }}
             timeoutSeconds: {{ .timeoutSeconds }}
             periodSeconds: {{ .periodSeconds }}
+            failureThreshold: {{ .failureThreshold }}
             exec:
               command:
                 - /bin/exists
                 - /etc/synse/plugin/healthy
             {{- end }}
             {{- end }}
+          {{- with .Values.resources }}
           resources:
-            {{- toYaml .Values.resources | trim | nindent 12 }}
+            {{- toYaml . | trim | nindent 12 }}
+          {{- end }}
+      {{- with .Values.nodeSelector }}
       nodeSelector:
-        {{- toYaml .Values.nodeSelector | trim | nindent 8 }}
+        {{- toYaml . | trim | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
       affinity:
-        {{- toYaml .Values.affinity | trim | nindent 8 }}
+        {{- toYaml . | trim | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
       tolerations:
-        {{- toYaml .Values.tolerations | trim | nindent 8 }}
+        {{- toYaml . | trim | nindent 8 }}
+      {{- end }}

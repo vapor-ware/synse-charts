@@ -1,0 +1,24 @@
+{{- if .Values.podSecurityPolicy.enabled }}
+{{ if .Capabilities.APIVersions.Has "policy/v1beta1" }}
+apiVersion: policy/v1beta1
+{{ else }}
+apiVersion: extensions/v1beta1
+{{ end -}}
+kind: PodSecurityPolicy
+metadata:
+  name: {{ .Values.podSecurityPolicy.name | default (include "juniper-jti.fullname" .) }}
+  labels:
+    {{- include "juniper-jti.labels" . | trim | nindent 4 }}
+    {{- with .Values.podSecurityPolicy.labels }}
+    {{- toYaml . | trim | nindent 4 }}
+    {{- end }}
+    {{- with .Values.globalLabels }}
+    {{- toYaml . | trim | nindent 4 }}
+    {{- end }}
+  {{- with .Values.podSecurityPolicy.annotations }}
+  annotations:
+    {{- toYaml . | trim | nindent 4 }}
+  {{- end }}
+spec:
+  {{- toYaml .Values.podSecurityPolicy.allowances | trim | nindent 2 }}
+{{- end }}
