@@ -7,46 +7,51 @@ metadata:
     {{- with .Values.deployment.labels }}
     {{- toYaml . | trim | nindent 4 }}
     {{- end }}
-  {{- if .Values.deployment.annotations }}
+    {{- with .Values.globalLabels }}
+    {{- toYaml . | trim | nindent 4 }}
+    {{- end }}
+  {{- with .Values.deployment.annotations }}
   annotations:
-    {{- toYaml .Values.deployment.annotations | trim | nindent 4 }}
+    {{- toYaml . | trim | nindent 4 }}
   {{- end }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.deployment.replicas }}
-  {{- end }}
   selector:
     matchLabels:
       {{- include "openconfig.selectorLabels" . | trim | nindent 6 }}
   template:
     metadata:
       name: {{ include "openconfig.fullname" . }}
-      labels:
-        {{- include "openconfig.selectorLabels" . | trim | nindent 8 }}
-        {{- with .Values.pod.labels }}
-        {{- toYaml . | trim | nindent 8 }}
-        {{- end }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
         checksum/secrets: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
         {{- with .Values.pod.annotations }}
         {{- toYaml . | trim | nindent 8 }}
         {{- end }}
+      labels:
+        {{- include "openconfig.selectorLabels" . | trim | nindent 8 }}
+        {{- with .Values.pod.labels }}
+        {{- toYaml . | trim | nindent 8 }}
+        {{- end }}
     spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | trim | nindent 8 }}
+      {{- end }}
       terminationGracePeriodSeconds: 3
       serviceAccountName: {{ include "openconfig.serviceAccountName" . }}
       {{- with .Values.pod.securityContext }}
       securityContext:
         {{- toYaml . | trim | nindent 8 }}
       {{- end }}
-      {{- if (or .Values.config .Values.tls.enabled) }}
+      {{- if (or .Values.config .Values.secrets.tls.enabled) }}
       volumes:
         {{- if .Values.config }}
         - name: config
           configMap:
             name: {{ include "openconfig.fullname" . }}-config
         {{- end }}
-        {{- if .Values.tls.enabled }}
+        {{- if .Values.secrets.tls.enabled }}
         - name: tls-secrets
           secret:
             secretName: {{ include "openconfig.fullname" . }}-tls-secrets
@@ -56,7 +61,7 @@ spec:
         - name: {{ .Chart.Name }}
           {{- with .Values.securityContext }}
           securityContext:
-            {{- toYaml . | trim | nindent 12 }}
+            {{- toYaml . | nindent 12 }}
           {{- end }}
           image: "{{ .Values.image.registry }}{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -75,24 +80,25 @@ spec:
           env:
             - name: PLUGIN_METRICS_ENABLED
               value: {{ .Values.metrics.enabled | quote }}
-            {{- range $secret := .Values.secrets }}
-            - name: {{ $secret.name | upper }}
+            {{- $fullname := include "openconfig.fullname" . }}
+            {{- range $secret := .Values.secrets.passwords }}
+            - name: {{ $secret.name | replace "-" "_" | upper }}
               valueFrom:
                 secretKeyRef:
-                  name: {{ $secret.name | replace "_" "-" }}
+                  name: {{ $fullname }}-{{ $secret.name | replace "_" "-" }}
                   key: secret
             {{- end }}
             {{- with .Values.env }}
-            {{- toYaml . | trim | nindent 12}}
+            {{- toYaml . | trim | nindent 12 }}
             {{- end }}
-          {{- if (or .Values.config .Values.tls.enabled) }}
+          {{- if (or .Values.config .Values.secrets.tls.enabled) }}
           volumeMounts:
             {{- if .Values.config }}
             - name: config
               mountPath: /etc/synse/plugin/config/config.yml
               subPath: config.yml
             {{- end }}
-            {{- if .Values.tls.enabled }}
+            {{- if .Values.secrets.tls.enabled }}
             - name: tls-secrets
               mountPath: /keys
             {{- end }}
@@ -103,6 +109,7 @@ spec:
             initialDelaySeconds: {{ .initialDelaySeconds }}
             timeoutSeconds: {{ .timeoutSeconds }}
             periodSeconds: {{ .periodSeconds }}
+            failureThreshold: {{ .failureThreshold }}
             exec:
               command:
                 - /bin/exists
@@ -115,13 +122,14 @@ spec:
             initialDelaySeconds: {{ .initialDelaySeconds }}
             timeoutSeconds: {{ .timeoutSeconds }}
             periodSeconds: {{ .periodSeconds }}
+            failureThreshold: {{ .failureThreshold }}
             exec:
               command:
                 - /bin/exists
                 - /etc/synse/plugin/healthy
           {{- end }}
           {{- end }}
-          {{- with .Values.resources}}
+          {{- with .Values.resources }}
           resources:
             {{- toYaml . | trim | nindent 12 }}
           {{- end }}

@@ -1,32 +1,35 @@
-{{- if and .Values.metrics.enabled .Values.monitoring.serviceMonitor.enabled }}
+{{- if and .Values.metrics.enabled .Values.serviceMonitor.enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ .Values.monitoring.serviceMonitor.name | default "openconfig-monitor" }}
-  {{- with .Values.monitoring.serviceMonitor.namespace }}
+  name: {{ .Values.serviceMonitor.name | default "openconfig-monitor" }}
+  {{- with .Values.serviceMonitor.namespace }}
   namespace: {{ . }}
   {{- end }}
   labels:
     {{- include "openconfig.labels" . | trim | nindent 4 }}
-    {{- with .Values.monitoring.serviceMonitor.labels }}
+    {{- with .Values.serviceMonitor.labels }}
+    {{- toYaml . | trim | nindent 4 }}
+    {{- end }}
+    {{- with .Values.globalLabels }}
     {{- toYaml . | trim | nindent 4 }}
     {{- end }}
 spec:
   endpoints:
-  - interval: {{ .Values.monitoring.serviceMonitor.interval | default "60s" }}
-    {{- with .Values.monitoring.serviceMonitor.path }}
-    path: {{ . | quote }}
+  - interval: {{ .Values.serviceMonitor.interval | default "60s" }}
+    {{- with .Values.serviceMonitor.path }}
+    path: {{ . }}
     {{- end }}
-    scrapeTimeout: {{ .Values.monitoring.serviceMonitor.timeout | default "30s" }}
-    targetPort: {{ .Values.monitoring.serviceMonitor.port }}
-  jobLabel: {{ .Values.monitoring.serviceMonitor.name | default "openconfig-monitor" }}
+    scrapeTimeout: {{ .Values.serviceMonitor.timeout | default "30s" }}
+    targetPort: {{ .Values.serviceMonitor.port }}
+  jobLabel: {{ .Values.serviceMonitor.name | default "openconfig-monitor" }}
   namespaceSelector:
     matchNames:
-    - {{ .Values.monitoring.serviceMonitor.selectorNamespace | default .Release.Namespace }}
+    - {{ .Values.serviceMonitor.selectorNamespace | default .Release.Namespace }}
   selector:
     matchLabels:
       {{- include "openconfig.selectorLabels" . | trim | nindent 6 }}
-      {{- with .Values.monitoring.serviceMonitor.selectorLabels }}
+      {{- with .Values.serviceMonitor.selectorLabels }}
       {{- toYaml . | trim | nindent 6 }}
       {{- end }}
 {{- end }}
