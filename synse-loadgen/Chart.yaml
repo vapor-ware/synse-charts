@@ -1,4 +1,5 @@
-apiVersion: v1
+apiVersion: v2
+type: application
 appVersion: 1.0.2
 description: Generate request loads against the Synse Server API
 home: https://github.com/vapor-ware/synse-loadgen
@@ -9,4 +10,4 @@ maintainers:
 name: synse-loadgen
 sources:
 - https://github.com/vapor-ware/synse-loadgen
-version: 1.0.2
+version: 2.0.0
