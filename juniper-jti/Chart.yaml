@@ -1,6 +1,7 @@
-apiVersion: v1
+apiVersion: v2
+type: application
 name: juniper-jti
-version: 0.1.5
+version: 1.0.0
 appVersion: 0.1.1
 description: Synse plugin to consume Juniper networking telemetry (JTI) over UDP
 home: https://github.com/vapor-ware/synse-juniper-jti-plugin
