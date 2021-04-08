@@ -1,6 +1,7 @@
-apiVersion: v1
+apiVersion: v2
+type: application
 name: modbus
-version: 2.1.9
+version: 3.0.0
 appVersion: 2.0.8
 description: Modbus over IP plugin for Synse
 home: https://github.com/vapor-ware/synse-modbus-ip-plugin
