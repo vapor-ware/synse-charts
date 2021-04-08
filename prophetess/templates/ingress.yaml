@@ -1,34 +1,57 @@
 {{- if .Values.ingress.enabled -}}
-{{- if semverCompare "<1.14-0" .Capabilities.KubeVersion.GitVersion -}}
-apiVersion: extensions/v1beta1
-{{- else -}}
+{{- $fullName := include "prophetess.fullname" . -}}
+{{- $svcPort := .Values.service.port -}}
+{{- $kubeTargetVersion := default .Capabilities.KubeVersion.GitVersion .Values.kubeTargetVersionOverride }}
+{{- if semverCompare ">=1.19.0-0" $kubeTargetVersion -}}
+apiVersion: networking.k8s.io/v1
+{{- else  -}}
 apiVersion: networking.k8s.io/v1beta1
 {{- end }}
 kind: Ingress
 metadata:
-  name: {{ template "prophetess.fullname" . }}
+  name: {{ $fullName }}
   labels:
-    app: {{ template "prophetess.fullname" . }}
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    heritage: "{{ .Release.Service }}"
-    release: "{{ .Release.Name }}"
-{{ if .Values.ingress.annotations -}}
+    {{- include "prophetess.labels" . | trim | nindent 4 }}
+    {{- with .Values.ingress.labels }}
+    {{- toYaml . | trim | nindent 4 }}
+    {{- end }}
+    {{- with .Values.globalLabels }}
+    {{- toYaml . | trim | nindent 4 }}
+    {{- end }}
+  {{- with .Values.ingress.annotations }}
   annotations:
-{{ toYaml .Values.ingress.annotations | indent 4 -}}
-{{- end }}
+    {{- toYaml . | trim | nindent 4 }}
+  {{- end }}
 spec:
+  {{- if .Values.ingress.tls }}
+  tls:
+    {{- range .Values.ingress.tls }}
+    - hosts:
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
   rules:
-    - host: {{ .Values.ingress.domain }}
+    {{- range .Values.ingress.hosts }}
+    - host: {{ .host | quote }}
       http:
         paths:
-          - path: /
+          {{- range .paths }}
+          - path: {{ . }}
+            {{- if semverCompare ">=1.19.0-0" $kubeTargetVersion }}
+            pathType: Prefix
             backend:
-              serviceName: {{ template "prophetess.fullname" . }}
-              servicePort: {{ default 80 .Values.service.port }}
-{{ if .Values.ingress.tls }}
-  tls:
-    - hosts:
-        - {{ .Values.ingress.domain }}
-      secretName: {{ .Values.ingress.domain }}-tls
-{{- end }}
-{{- end }}
+              service:
+                name: {{ $fullName }}
+                port:
+                  number: {{ $svcPort }}
+            {{- else  }}
+            backend:
+              serviceName: {{ $fullName }}
+              servicePort: {{ $svcPort }}
+            {{- end }}
+          {{- end }}
+    {{- end }}
+  {{- end }}
