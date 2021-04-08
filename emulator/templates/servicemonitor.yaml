@@ -1,36 +1,35 @@
-{{- if and .Values.metrics.enabled .Values.monitoring.serviceMonitor.enabled }}
+{{- if and .Values.metrics.enabled .Values.serviceMonitor.enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ .Values.monitoring.serviceMonitor.name | default "emulator-monitor" }}
-  {{- if .Values.monitoring.serviceMonitor.namespace }}
-  namespace: {{ .Values.monitoring.serviceMonitor.namespace }}
+  name: {{ .Values.serviceMonitor.name | default "emulator-monitor" }}
+  {{- with .Values.serviceMonitor.namespace }}
+  namespace: {{ . }}
   {{- end }}
   labels:
-    app: {{ template "name" . }}
-    chart: {{ template "chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-    {{- if .Values.monitoring.serviceMonitor.labels }}
-    {{ toYaml .Values.monitoring.serviceMonitor.labels | trim | nindent 4 }}
+    {{- include "emulator.labels" . | trim | nindent 4 }}
+    {{- with .Values.serviceMonitor.labels }}
+    {{- toYaml . | trim | nindent 4 }}
+    {{- end }}
+    {{- with .Values.globalLabels }}
+    {{- toYaml . | trim | nindent 4 }}
     {{- end }}
 spec:
   endpoints:
-  - interval: {{ .Values.monitoring.serviceMonitor.interval | default "60s" }}
-    {{- if .Values.monitoring.serviceMonitor.path }}
-    path: {{ .Values.monitoring.serviceMonitor.path }}
+  - interval: {{ .Values.serviceMonitor.interval | default "60s" }}
+    {{- with .Values.serviceMonitor.path }}
+    path: {{ . }}
     {{- end }}
-    scrapeTimeout: {{ .Values.monitoring.serviceMonitor.timeout | default "30s" }}
-    targetPort: {{ .Values.monitoring.serviceMonitor.port }}
-  jobLabel: {{ .Values.monitoring.serviceMonitor.name | default "emulator-monitor" }}
+    scrapeTimeout: {{ .Values.serviceMonitor.timeout | default "30s" }}
+    targetPort: {{ .Values.serviceMonitor.port }}
+  jobLabel: {{ .Values.serviceMonitor.name | default "emulator-monitor" }}
   namespaceSelector:
     matchNames:
-    - {{ .Values.monitoring.serviceMonitor.selectorNamespace | default .Release.Namespace }}
+    - {{ .Values.serviceMonitor.selectorNamespace | default .Release.Namespace }}
   selector:
     matchLabels:
-      app: {{ template "name" . }}
-      release: {{ .Release.Name }}
-      {{-  if .Values.monitoring.serviceMonitor.selectorLabels }}
-      {{ toYaml .Values.monitoring.serviceMonitor.selectorLabels }}
+      {{- include "emulator.selectorLabels" . | trim | nindent 6 }}
+      {{- with .Values.serviceMonitor.selectorLabels }}
+      {{- toYaml . | trim | nindent 6 }}
       {{- end }}
 {{- end }}
