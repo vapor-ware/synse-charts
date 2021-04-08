@@ -2,111 +2,14 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-
 ## Partially override the fullname template (will maintain the release name).
 nameOverride: ""
 
 ## Fully override the fullname template.
 fullnameOverride: ""
 
-## Image configuration options.
-image:
-  registry: "" # Add a registry if we need to use the non-default one
-  repository: vaporio/emulator-plugin
-  tag: "3.2.2"
-  pullPolicy: Always
-
-## Enable/disable application metrics export via Prometheus.
-metrics:
-  enabled: false
-
-  ## Labels applied to the metrics service definition. This should be
-  ## set when running with Prometheus monitoring so the service monitor
-  ## can differentiate the metrics service from other defined services.
-  labels: {}
-
-## Prometheus monitoring
-monitoring:
-  serviceMonitor:
-    enabled: false
-    name: emulator-monitor
-    port: metrics
-    path: "/metrics"
-    timeout: 4s
-    interval: 5s
-
-    # Deploy the ServiceMonitor to a namespace other than the target for the Release. Required in some setups.
-    namespace: ""
-    # Which namespace the prometheus tooling should interrogate to find services and pods.
-    selectorNamespace: ""
-    # Labels used to select the services/pods to monitor.
-    selectorLabels: {}
-    # Labels applied to the ServiceMonitor.
-    labels: {}
-      #vapor.io/monitor: application
-
-## Deployment configuration options.
-deployment:
-  annotations: {}
-  labels: {}
-  replicas: 1
-
-## Pod configuration options.
-pod:
-  annotations: {}
-  labels: {}
-
-## Service configurations for the emulator plugin.
-## ref: http://kubernetes.io/docs/user-guide/services/
-##
-## The port here should match the network address in the
-## plugin configuration, below.
-service:
-  annotations: {}
-  labels: {}
-  port: 5001
-
-## Readiness and liveness probe configuration options
-## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/
-livenessProbe:
-  enabled: true
-  initialDelaySeconds: 30
-  timeoutSeconds: 5
-  periodSeconds: 5
-readinessProbe:
-  enabled: true
-  initialDelaySeconds: 5
-  timeoutSeconds: 2
-  periodSeconds: 5
-
-## Pass arguments to the plugin container. For additional startup
-## logging, you can pass the --debug flag. By default, no additional
-## arguments are passed to the container.
-#args: ["--debug"]
-args: []
-
-## Allow pass-through environment variable configuration.
-env: {}
-
-## Configure resource requests and limits.
-## ref: http://kubernetes.io/docs/user-guide/compute-resources/
-resources:
-  requests: {}
-  limits: {}
-
-## Node labels for pod assignment
-## Ref: https://kubernetes.io/docs/user-guide/node-selection/
-nodeSelector: {}
-
-## Tolerations for pod assignment
-## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
-tolerations: []
-
-## Affinity for pod assignment
-## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
-affinity: {}
-
 ## Synse Emulator Plugin configuration.
+##
 ## The emulator plugin image comes pre-built with a default sane configuration.
 ## The block below may be uncommented if a custom configuration is desired.
 #config:
@@ -121,3 +24,195 @@ config: {}
 ## are specified here, the emulator will use the default built-in
 ## configurations.
 devices: {}
+
+## Labels applied to all manifest objects for the Chart.
+globalLabels: {}
+
+## Image configuration options.
+image:
+  registry: ""
+  repository: vaporio/emulator-plugin
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+## Pull secrets for pulling private images.
+imagePullSecrets: []
+#  - name: my-pull-secret
+
+## Enable/disable application metrics export via Prometheus.
+metrics:
+  enabled: false
+
+  ## Labels applied to the metrics service definition. This should be
+  ## set when running with Prometheus monitoring so the service monitor
+  ## can differentiate the metrics service from other defined services.
+  labels: {}
+
+## Service account configuration options.
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+serviceAccount:
+  create: false
+  annotations: {}
+  labels: {}
+  ## The name of the service account to use.
+  ## If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+## Deployment configuration options.
+## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+deployment:
+  annotations: {}
+  labels: {}
+  replicas: 1
+
+## Configuration options for container security context.
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+## Pod-specific configuration options.
+## ref: https://kubernetes.io/docs/concepts/workloads/pods/
+pod:
+  annotations: {}
+  labels: {}
+  securityContext: {}
+    # fsGroup: 2000
+
+## Service configuration options.
+## ref: https://kubernetes.io/docs/concepts/services-networking/service/
+##
+## The port here should match the network address in the
+## plugin configuration, above.
+service:
+  annotations: {}
+  labels: {}
+  type: ClusterIP
+  port: 5001
+
+## Ingress configuration options.
+## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: internal
+    # cert-manager.io/cluster-issuer: le-gdns
+  labels: {}
+  hosts: []
+  #  - host: chart-example.local
+  #    paths: []
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+## Prometheus monitoring configuration.
+## ref: https://docs.openshift.com/container-platform/4.4/rest_api/monitoring_apis/servicemonitor-monitoring-coreos-com-v1.html
+serviceMonitor:
+  enabled: false
+  name: emulator-monitor
+  port: metrics
+  path: /metrics
+  timeout: 4s
+  interval: 5s
+
+  namespace: ""
+  labels: {}
+    # vapor.io/monitor: application
+
+  selectorNamespace: ""
+  selectorLabels: {}
+
+## Configure a horizontal pod autoscaler.
+## ref: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+## Configuration options for a PodDisruptionBudget.
+## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/#specifying-a-poddisruptionbudget
+podDisruptionBudget:
+  enabled: false
+  annotations: {}
+  labels: {}
+#  minAvailable: 2
+#  maxUnavailable: 1
+
+## Configuration options for pod security policies.
+## ref: https://kubernetes.io/docs/concepts/policy/pod-security-policy/
+podSecurityPolicy:
+  enabled: false
+  name: ""
+  annotations: {}
+  labels: {}
+  allowances: {}
+#    privileged: false
+#    seLinux:
+#      rule: RunAsAny
+#    supplementalGroups:
+#      rule: RunAsAny
+#    runAsUser:
+#      rule: RunAsAny
+#    fsGroup:
+#      rule: RunAsAny
+#    volumes:
+#      - '*'
+
+## Readiness and liveness probe configuration options.
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 10
+  timeoutSeconds: 3
+  periodSeconds: 5
+  failureThreshold: 2
+
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 10
+  timeoutSeconds: 3
+  periodSeconds: 5
+  failureThreshold: 2
+
+## Specify arguments to pass to the container. By default, no arguments are passed.
+## ref: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/
+##
+## For additional startup logging, you can pass the --debug flag.
+#args: ["--debug"]
+args: []
+
+## Allow pass-through environment variable configuration.
+## ref: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/
+env: []
+  # - name: FOO
+  #   value: bar
+
+## Configure resource requests and limits.
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+## Node labels for pod assignment.
+## ref: https://kubernetes.io/docs/user-guide/node-selection/
+nodeSelector: {}
+
+## Tolerations for pod assignment.
+## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+tolerations: []
+
+## Affinity for pod assignment.
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+affinity: {}

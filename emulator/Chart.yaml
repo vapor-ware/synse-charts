@@ -1,4 +1,4 @@
-apiVersion: v1
+apiVersion: v2
 appVersion: 3.2.2
 description: A Synse plugin providing emulated devices and reading data
 home: https://github.com/vapor-ware/synse-emulator-plugin
@@ -13,4 +13,4 @@ maintainers:
 name: emulator
 sources:
 - https://github.com/vapor-ware/synse-emulator-plugin.git
-version: 3.1.6
+version: 4.0.0
