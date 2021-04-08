@@ -1,25 +1,134 @@
-## Change the name of the resource
-## Default: use the chart name
-# nameOverride:
+# Default values for prophetess.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
 
+## Partially override the fullname template (will maintain the release name).
+nameOverride: ""
+
+## Fully override the fullname template.
+fullnameOverride: ""
+
+## Application configuration.
+config: {}
+
+## Labels applied to all manifest objects for the Chart.
+globalLabels: {}
+
+## Image configuration options.
+image:
+  registry: ""
+  repository: vaporio/prophetess
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+## Pull secrets for pulling private images.
+imagePullSecrets: []
+#  - name: my-pull-secret
+
+## Service account configuration options.
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+serviceAccount:
+  create: false
+  annotations: {}
+  labels: {}
+  ## The name of the service account to use.
+  ## If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+## Deployment configuration options.
+## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+deployment:
+  annotations: {}
+  labels: {}
+  replicas: 1
+
+## Configuration options for container security context.
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+## Pod-specific configuration options.
+## ref: https://kubernetes.io/docs/concepts/workloads/pods/
 pod:
-  pullSecret: ""
-  prophetess:
-    image: vaporio/prophetess:0.2.1
-    pullPolicy: "Always"
-    securityContext:
-      privileged: false
+  annotations: {}
+  labels: {}
+  securityContext: {}
+    # fsGroup: 2000
 
-prophetess:
-  config: {}
-  port: 8080
-  debug: false
-
+## Service configuration options.
+## ref: https://kubernetes.io/docs/concepts/services-networking/service/
 service:
+  annotations: {}
+  labels: {}
+  type: ClusterIP
   port: 80
 
+## Ingress configuration options.
+## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ingress:
   enabled: false
-  domain:
-  annotations:
-  tls: false
+  annotations: {}
+    # kubernetes.io/ingress.class: internal
+    # cert-manager.io/cluster-issuer: le-gdns
+  labels: {}
+  hosts: []
+  #  - host: chart-example.local
+  #    paths: []
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+## Configuration options for pod security policies.
+## ref: https://kubernetes.io/docs/concepts/policy/pod-security-policy/
+podSecurityPolicy:
+  enabled: false
+  name: ""
+  annotations: {}
+  labels: {}
+  allowances: {}
+#    privileged: false
+#    seLinux:
+#      rule: RunAsAny
+#    supplementalGroups:
+#      rule: RunAsAny
+#    runAsUser:
+#      rule: RunAsAny
+#    fsGroup:
+#      rule: RunAsAny
+#    volumes:
+#      - '*'
+
+## Allow pass-through environment variable configuration.
+## ref: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/
+env: []
+  # - name: FOO
+  #   value: bar
+
+## Configure resource requests and limits.
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+## Node labels for pod assignment.
+## ref: https://kubernetes.io/docs/user-guide/node-selection/
+nodeSelector: {}
+
+## Tolerations for pod assignment.
+## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+tolerations: []
+
+## Affinity for pod assignment.
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+affinity: {}

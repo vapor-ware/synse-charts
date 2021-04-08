@@ -1,18 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: {{ include "prophetess.fullname" . }}
   labels:
-    app: {{ template "prophetess.fullname" . }}
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    heritage: "{{ .Release.Service }}"
-    release: "{{ .Release.Name }}"
-  name: {{ template "prophetess.fullname" . }}
+    {{- include "prophetess.labels" . | trim | nindent 4 }}
+    {{- with .Values.deployment.labels }}
+    {{- toYaml . | trim | nindent 4 }}
+    {{- end }}
+    {{- with .Values.globalLabels }}
+    {{- toYaml . | trim | nindent 4 }}
+    {{- end }}
+  {{- with .Values.deployment.annotations }}
+  annotations:
+    {{- toYaml . | trim | nindent 4 }}
+  {{- end }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.deployment.replicas }}
   selector:
     matchLabels:
-      app: {{ template "prophetess.fullname" . }}
-      release: "{{ .Release.Name }}"
+      {{- include "prophetess.selectorLabels" . | trim | nindent 6 }}
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -20,24 +26,64 @@ spec:
     type: RollingUpdate
   template:
     metadata:
+      name: {{ include "prophetess.fullname" . }}
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        {{- with .Values.pod.annotations }}
+        {{- toYaml . | trim | nindent 8 }}
+        {{- end }}
       labels:
-        app: {{ template "prophetess.fullname" . }}
-        release: "{{ .Release.Name }}"
+        {{- include "prophetess.selectorLabels" . | trim | nindent 8 }}
+        {{- with .Values.pod.labels }}
+        {{- toYaml . | trim | nindent 8 }}
+        {{- end }}
     spec:
-     {{- if .Values.pod.pullSecret }}
+      {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
-       - name: {{ .Values.pod.pullSecret }}
-     {{- end }}
+        {{- toYaml . | trim | nindent 8 }}
+      {{- end }}
+      terminationGracePeriodSeconds: 3
+      serviceAccountName: {{ include "prophetess.serviceAccountName" . }}
+      {{- with .Values.pod.securityContext }}
+      securityContext:
+        {{- toYaml . | trim | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: config
+          secret:
+            secretName: {{ include "prophetess.fullname" . }}
       containers:
         - name: prophetess
-          image: {{ .Values.pod.prophetess.image | quote }}
-          imagePullPolicy: {{ default "Always" .Values.pod.prophetess.pullPolicy | quote }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.image.registry }}{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          {{- with .Values.env }}
+          env:
+            {{- toYaml . | trim | nindent 12 }}
+          {{- end }}
           volumeMounts:
             - name: config
               mountPath: /etc/prophetess
-      volumes:
-      - name: config
-        secret:
-          secretName: {{ template "prophetess.fullname" . }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | trim | nindent 12 }}
+          {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | trim | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | trim | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | trim | nindent 8 }}
+      {{- end }}
