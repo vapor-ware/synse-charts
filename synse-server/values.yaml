@@ -23,7 +23,7 @@ image:
   repository: vaporio/synse-server
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: "v3.2.1"
 
 ## Pull secrets for pulling private images.
 imagePullSecrets: []
