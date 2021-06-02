@@ -48,7 +48,7 @@ The following table lists the configurable parameters of the Synse Server chart 
 | `metrics.enabled` | Enable/disable application metrics export (via Prometheus) at `/metrics`. | `false` |
 | `image.registry` | The image registry to use. | `""` |
 | `image.repository` | The name of the image to use. | `vaporio/synse-server` |
-| `image.tag` | The tag of the image to use. | `v3.2.0` |
+| `image.tag` | The tag of the image to use. | `v3.2.1` |
 | `image.pullPolicy` | The image pull policy. | `Always` |
 | `deployment.labels` | Additional labels for the Deployment. | `{}` |
 | `deployment.annotations` | Additional annotations for the Deployment. | `{}` |
