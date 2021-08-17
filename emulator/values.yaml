@@ -34,7 +34,7 @@ image:
   repository: vaporio/emulator-plugin
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: "3.3.0"
 
 ## Pull secrets for pulling private images.
 imagePullSecrets: []
