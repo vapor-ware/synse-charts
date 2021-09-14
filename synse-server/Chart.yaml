@@ -1,15 +1,15 @@
 apiVersion: v2
-type: application
-name: synse-server
-version: 4.0.2
-appVersion: v3.3.0
+appVersion: v3.4.0
 description: An API to monitor and control physical and virtual infrastructure
 home: https://github.com/vapor-ware/synse-server
 icon: https://charts.vapor.io/.images/synse-server-chart.jpg
-sources:
-  - https://github.com/vapor-ware/synse-server
 maintainers:
-  - name: Erick Daniszewski
-    email: erick@vapor.io
-  - name: Marco Ceppi
-    email: marco@vapor.io
+- email: erick@vapor.io
+  name: Erick Daniszewski
+- email: marco@vapor.io
+  name: Marco Ceppi
+name: synse-server
+sources:
+- https://github.com/vapor-ware/synse-server
+type: application
+version: 4.0.3
