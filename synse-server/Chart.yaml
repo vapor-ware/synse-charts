@@ -1,5 +1,5 @@
 apiVersion: v2
-appVersion: v3.4.0
+appVersion: v3.4.1
 description: An API to monitor and control physical and virtual infrastructure
 home: https://github.com/vapor-ware/synse-server
 icon: https://charts.vapor.io/.images/synse-server-chart.jpg
@@ -12,4 +12,4 @@ name: synse-server
 sources:
 - https://github.com/vapor-ware/synse-server
 type: application
-version: 4.0.3
+version: 4.0.4
