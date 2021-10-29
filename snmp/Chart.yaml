@@ -1,8 +1,8 @@
 apiVersion: v2
 type: application
 name: snmp
-version: 3.1.7
-appVersion: 2.2.1 # Same as image tag.
+version: 3.1.8
+appVersion: 2.2.2 # Same as image tag.
 description: SNMP plugin for Synse
 home: https://github.com/vapor-ware/synse-snmp-plugin
 icon: https://charts.vapor.io/.images/synse-snmp.jpg
@@ -13,5 +13,3 @@ maintainers:
   email: mhink@vapor.io
 - name: Marco Ceppi
   email: marco@vapor.io
-- name: Erick Daniszewski
-  email: erick@vapor.io
