@@ -1,0 +1,26 @@
+# Create a network policy for openconfig.
+# TODO: A lot of this needs to be abstracted out to values, but this is a place to start.
+# Ingress allow all.
+# Egress: Network devices only accept connections from from the 10.244.0.0/14  network.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: openconfig-network-policy
+  {{/* namespace: {{ .Values.namespace | default "default" }} THIS DID NOT TAKE FOR SOME REASON */}}
+  namespace: "ke1-las"
+spec:
+  podSelector:
+    matchLabels:
+      role: openconfig-network-devices
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - {} # Allow all.
+  egress:
+  - to:
+    - ipBlock:
+        cidr: 10.244.0.0/14 # Same as the network devices filter. TODO - Will this affect grpc to synse-server???
+    ports:
+    - protocol: TCP
+      port: 32767
