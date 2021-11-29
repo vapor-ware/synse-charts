@@ -1,0 +1,13 @@
+# Enable outgoing NAT on 10.24.0.14 because nework devices using openconfig
+# only accept connections from this IP range.
+apiVersion: projectcalico.org/v3 # TODO: Is this the correct apiVersion?
+kind: IPPool
+#kind: ipPool (Case sensitivity should not matter.)
+metadata:
+  name: default-ipv4-ippool # TODO: Change name
+spec:
+  cidr: 10.244.0.0/14
+  natOutgoing: true
+  # New tries below: 2021-11-19
+  nodeSelector: all()
+  disabled: false
