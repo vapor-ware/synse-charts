@@ -1,0 +1,10 @@
+{{- $fullName := include "openconfig.fullname" . -}}
+apiVersion: staticegressips.nirmata.io/v1alpha1
+kind: StaticEgressIP
+metadata:
+  name: static-egress-ip
+spec:
+  rules:
+  - egressip: 10.244.0.80
+    service-name: {{ $fullName }}
+    cidr: 10.244.0.0/14
