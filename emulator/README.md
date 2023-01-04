@@ -48,7 +48,7 @@ The following table lists the configurable parameters of the Synse Emulator Plug
 | `metrics.enabled` | Enable/disable application metrics export (via Prometheus) at `:2112/metrics`. | `false` |
 | `image.registry` | The image registry to use. | `""` |
 | `image.repository` | The name of the image to use. | `vaporio/emulator-plugin` |
-| `image.tag` | The tag of the image to use. | `3.2.2` |
+| `image.tag` | The tag of the image to use. | `{{.Chart.AppVersion}}` |
 | `image.pullPolicy` | The image pull policy. | `Always` |
 | `deployment.labels` | Additional labels for the Deployment. | `{}` |
 | `deployment.annotations` | Additional annotations for the Deployment. | `{}` |

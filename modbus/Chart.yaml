@@ -1,8 +1,8 @@
 apiVersion: v2
 type: application
 name: modbus
-version: 3.0.0
-appVersion: 2.0.8
+version: 3.1.3
+appVersion: 2.1.7 # Same as the modbus image version.
 description: Modbus over IP plugin for Synse
 home: https://github.com/vapor-ware/synse-modbus-ip-plugin
 icon: https://charts.vapor.io/.images/synse-modbus.jpg
@@ -13,5 +13,3 @@ maintainers:
   email: mhink@vapor.io
 - name: Marco Ceppi
   email: marco@vapor.io
-- name: Erick Daniszewski
-  email: erick@vapor.io

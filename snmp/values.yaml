@@ -98,8 +98,6 @@ pod:
   annotations: {}
   labels: {}
   hostname: ""
-  securityContext:
-    privileged: false
 
 ## Service configuration options.
 ## ref: https://kubernetes.io/docs/concepts/services-networking/service/

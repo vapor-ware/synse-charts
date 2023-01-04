@@ -1,7 +1,7 @@
 # Synse OpenConfig Plugin
 
 The [Synse OpenConfig Plugin](https://github.com/vapor-ware/synse-openconfig-plugin) is a Synse plugin
-which provides networking data from OpenConfig data streams. 
+which provides networking data from OpenConfig data streams.
 
 ## TL;DR;
 
