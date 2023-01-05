@@ -13,4 +13,4 @@ maintainers:
 name: emulator
 sources:
 - https://github.com/vapor-ware/synse-emulator-plugin.git
-version: 4.0.3
+version: 4.0.4

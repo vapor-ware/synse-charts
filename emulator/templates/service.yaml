@@ -17,7 +17,6 @@ metadata:
     {{- end }}
 spec:
   type: {{ .Values.service.type | default "ClusterIP" }}
-  clusterIP: None
   ports:
     - name: http
       port: {{ .Values.service.port }}
