@@ -1,0 +1,23 @@
+name: charts
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  validate:
+    uses: vapor-ware/workflows/.github/workflows/validate-charts.yml@main
+    with:
+      k8s_version: 1.24.15
+      charts_path: '*/'
+
+  publish:
+    if: ${{ github.event.pull_request.merged }}
+    needs: [validate]
+    uses: vapor-ware/workflows/.github/workflows/publish-charts.yml@main
+    secrets: inherit
+    with:
+      bucket_name: charts.vapor.io
