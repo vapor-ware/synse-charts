@@ -1,0 +1,50 @@
+name: validate-charts
+description: "Validates helm templates"
+inputs:
+  k8s_version:
+    type: string
+    description: "Kubernetes API server version"
+    default: "1.24.15"
+    required: true
+  charts_path:
+    type: string
+    description: "Path of charts folder"
+    default: "charts/*"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: Install Helm
+      uses: azure/setup-helm@v3
+      with:
+        version: v3.12.1
+    - name: Add Helm Repos
+      run: |
+        helm repo add bitnami https://charts.bitnami.com/bitnami
+
+    - name: Lint
+      run: |
+        helm lint ${{ inputs.charts_path }}
+    - name: Template
+      env:
+        VERSION: ${{ inputs.k8s_version }}
+      run: |
+        for c in $(ls charts)
+        do
+          helm template "${c}" "charts/${c}" --debug --kube-version $VERSION --dependency-update --output-dir dist
+        done
+    - uses: docker://ghcr.io/yannh/kubeconform:latest
+      env:
+        VERSION: ${{ inputs.k8s_version }}
+      with:
+        entrypoint: '/kubeconform'
+        args: >
+          -kubernetes-version $VERSION
+          -ignore-missing-schemas
+          -summary
+          --output json
+          dist
