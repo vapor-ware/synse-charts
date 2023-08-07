@@ -12,4 +12,4 @@ name: synse-server
 sources:
 - https://github.com/vapor-ware/synse-server
 type: application
-version: 4.0.5
+version: 4.1.5
