@@ -3,12 +3,10 @@ on:
     inputs:
       bucket_name:
         type: string
-        description: "Name of GCS bucket (charts.vio.sh for private and charts.vapor.io for public)"
+        description: "Name of GCS bucket (charts.vapor.io)"
         default: false
         required: true
-    secrets:
-      VIO_BUILD_SA:
-        required: true
+
 jobs:
   publish-charts:
     permissions:
@@ -24,7 +22,7 @@ jobs:
           version: v3.12.1
       - uses: google-github-actions/auth@v1
         with:
-          credentials_json: ${{ secrets.VIO_BUILD_SA }}
+          credentials_json: ${{ secrets.SYNSE_CHARTS_SA }}
       - name: Setup gcloud
         uses: google-github-actions/setup-gcloud@v1
         with:
