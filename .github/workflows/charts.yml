@@ -8,16 +8,17 @@ on:
       - master
 
 jobs:
-  validate:
-    uses: vapor-ware/workflows/.github/workflows/validate-charts.yml@main
+  validate-charts:
+    name: 'Validate'
+    uses: ./.github/workflows/validate-charts.yml
     with:
       k8s_version: 1.24.15
       charts_path: '*/'
 
   publish:
-    if: ${{ github.event.pull_request.merged }}
-    needs: [validate]
-    uses: vapor-ware/workflows/.github/workflows/publish-charts.yml@main
-    secrets: inherit
+    name: 'Publish'
+    if: ${{ github.ref == 'refs/heads/master' }}
+    needs: [validate-charts]
+    uses: ./.github/workflows/publish-charts.yml
     with:
       bucket_name: charts.vapor.io

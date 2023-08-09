@@ -1,0 +1,10 @@
+name: manual-publish
+on:
+  workflow_dispatch:
+    inputs:
+
+jobs:
+  manual-publish:
+    uses: ./.github/workflows/publish-charts.yml
+    with:
+      bucket_name: charts.vapor.io

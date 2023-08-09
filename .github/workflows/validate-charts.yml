@@ -1,0 +1,52 @@
+on:
+  workflow_call:
+    inputs:
+      k8s_version:
+        type: string
+        description: "Kubernetes API server version"
+        default: "1.24.15"
+        required: true
+      charts_path:
+        type: string
+        description: "Path of charts folder"
+        default: "charts/*"
+        required: true
+
+jobs:
+  validate:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.12.1
+      - name: Add Helm Repos
+        run: |
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+
+      - name: Lint
+        run: |
+          helm lint ${{ inputs.charts_path }}
+      - name: Template
+        env:
+          VERSION: ${{ inputs.k8s_version }}
+        run: |
+          for c in $(find . -maxdepth 1 -mindepth 1 ! -path '*/.*' -type d -printf '%P\n')
+          do
+            helm template "${c}" "${c}" --debug --kube-version $VERSION --dependency-update --output-dir dist
+          done
+      - uses: docker://ghcr.io/yannh/kubeconform:latest
+        env:
+          VERSION: ${{ inputs.k8s_version }}
+        with:
+          entrypoint: '/kubeconform'
+          args: >
+            -kubernetes-version $VERSION
+            -ignore-missing-schemas
+            -summary
+            --output json
+            dist
