@@ -35,9 +35,9 @@ jobs:
         env:
           VERSION: ${{ inputs.k8s_version }}
         run: |
-          for c in $(find . -maxdepth 1 -mindepth 1 ! -path '*/.*' -type d -printf '%P\n')
+          for c in $(ls charts)
           do
-            helm template "${c}" "${c}" --debug --kube-version $VERSION --dependency-update --output-dir dist
+            helm template "${c}" "charts/${c}" --debug --kube-version $VERSION --dependency-update --output-dir dist
           done
       - uses: docker://ghcr.io/yannh/kubeconform:latest
         env:
