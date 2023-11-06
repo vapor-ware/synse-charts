@@ -6,5 +6,6 @@ on:
 jobs:
   manual-publish:
     uses: ./.github/workflows/publish-charts.yml
+    secrets: inherit
     with:
       bucket_name: charts.vapor.io
