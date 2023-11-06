@@ -13,7 +13,7 @@ jobs:
     uses: ./.github/workflows/validate-charts.yml
     with:
       k8s_version: 1.24.15
-      charts_path: '*/'
+      charts_path: 'charts/*'
 
   publish:
     name: 'Publish'
